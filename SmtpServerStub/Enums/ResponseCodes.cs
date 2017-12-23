@@ -1,6 +1,6 @@
 ﻿namespace SmtpServerStub.Enums
 {
-	public enum ResponseCodes
+    internal enum ResponseCodes
 	{
 		NonStdSuccess,
 		SysHelp,

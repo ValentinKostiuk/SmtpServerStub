@@ -1,6 +1,6 @@
 ﻿namespace SmtpServerStub.SmtpApplication.Interfaces
 {
-    public interface ITcpClientController
+    internal interface ITcpClientController
     {
         void SwitchToSslProtocol();
         void Write(string message);

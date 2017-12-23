@@ -4,7 +4,7 @@ using SmtpServerStub.SmtpApplication.Interfaces;
 
 namespace SmtpServerStub.SmtpApplication
 {
-    public class TcpClientHandlerFactory : ISmtpServerClientHandlerFactory
+    internal class TcpClientHandlerFactory : ISmtpServerClientHandlerFactory
     {
         internal X509Certificate ServerCertificate { get; set; }
 

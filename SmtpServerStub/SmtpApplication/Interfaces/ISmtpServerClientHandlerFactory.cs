@@ -2,7 +2,7 @@
 
 namespace SmtpServerStub.SmtpApplication.Interfaces
 {
-    public interface ISmtpServerClientHandlerFactory
+    internal interface ISmtpServerClientHandlerFactory
     {
         ISmtpServerClientProcessor Create(TcpClient client);
     }

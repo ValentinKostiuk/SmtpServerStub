@@ -10,7 +10,7 @@ using SmtpServerStub.SmtpApplication.Interfaces;
 
 namespace SmtpServerStub.SmtpApplication
 {
-    public class TcpClientController : ITcpClientController
+    internal class TcpClientController : ITcpClientController
     {
         private readonly TcpClient _client;
         private readonly SslStream _sslStream;

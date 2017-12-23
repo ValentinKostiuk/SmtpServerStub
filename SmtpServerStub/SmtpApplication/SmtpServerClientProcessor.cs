@@ -7,7 +7,7 @@ using SmtpServerStub.Utilities;
 
 namespace SmtpServerStub.SmtpApplication
 {
-    public class SmtpServerClientProcessor : ISmtpServerClientProcessor
+    internal class SmtpServerClientProcessor : ISmtpServerClientProcessor
     {
         private readonly ITcpClientController _clientController;
 

@@ -1,6 +1,6 @@
 ﻿namespace SmtpServerStub.Enums
 {
-	public enum RequestCommands
+    internal enum RequestCommands
 	{
 		Hello,
 		MailFrom,
