@@ -3,4 +3,4 @@ image:
 before_build:
  - nuget restore
 build_script:
- - msbuild /package /verbosity:quiet "SmtpServerStub.sln"
+ - msbuild /t:pack /verbosity:quiet "SmtpServerStub.sln"
