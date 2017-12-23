@@ -2,6 +2,14 @@ image:
  - Visual Studio 2017
 before_build:
  - nuget restore
+ # overwrite patching properties for non release version of packages  
+for:
+-
+  branches:
+    only:
+     - /^(?!master)$/
+  dotnet_csproj:
+   package_version: '{version}-{branch}'
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
@@ -22,13 +30,3 @@ deploy:
     secure: QyWHWGXcIG2o5u9H+9jd1C+5I1XwAYHajrsKyk1oG/4p280tqT6T5OM2QGj53uBH
   skip_symbols: true
   artifact: /.*\.nupkg/
-  
-
-# overwrite patching properties for non release version of packages  
-for:
--
-  branches:
-    only:
-     - /^(?!master)$/
-  dotnet_csproj:
-   package_version: '{version}-{branch}'
