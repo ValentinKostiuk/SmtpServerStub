@@ -1,3 +1,12 @@
+# overwrite patching properties for non release version of packages  
+for:
+-
+  branches:
+    except:
+     - master
+  dotnet_csproj:
+   package_version: '{version}-{branch}'
+   
 image:
  - Visual Studio 2017
 before_build:
@@ -20,12 +29,3 @@ deploy:
     secure: QyWHWGXcIG2o5u9H+9jd1C+5I1XwAYHajrsKyk1oG/4p280tqT6T5OM2QGj53uBH
   skip_symbols: true
   artifact: /.*\.nupkg/
-  
-# overwrite patching properties for non release version of packages  
-for:
--
-  branches:
-    except:
-     - master
-  dotnet_csproj:
-   package_version: '{version}-{branch}'
