@@ -3,7 +3,7 @@ image:
 before_build:
  - nuget restore
 build_script:
- - msbuild /t:pack /verbosity:quiet "SmtpServerStub.sln"
+ - msbuild /t:pack "./SmtpServerStub/SmtpServerStub.csproj" /verbosity:quiet "SmtpServerStub.sln"
 deploy:
  provider: NuGet
  api_key:
