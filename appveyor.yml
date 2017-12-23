@@ -4,8 +4,8 @@ before_build:
  - nuget restore
 build_script:
  - msbuild /t:pack /verbosity:quiet "SmtpServerStub.sln"
- deploy:
-  provider: NuGet
-  api_key:
-    secure: QyWHWGXcIG2o5u9H+9jd1C+5I1XwAYHajrsKyk1oG/4p280tqT6T5OM2QGj53
-  artifact: /.*\.nupkg/
+deploy:
+ provider: NuGet
+ api_key:
+  secure: QyWHWGXcIG2o5u9H+9jd1C+5I1XwAYHajrsKyk1oG/4p280tqT6T5OM2QGj53
+ artifact: /.*\.nupkg/
