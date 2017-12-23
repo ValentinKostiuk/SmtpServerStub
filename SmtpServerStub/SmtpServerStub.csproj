@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>ValentinKostyuk.SmtpServerStub</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>valentin.kostiuk@gmail.com</Authors>
+    <Description>Allows to run simple SMTP server stub on selected port</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <Copyright>Copyright 2017</Copyright>
+    <PackageTags>SMTP Stub Testing</PackageTags>
+</PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\SmtpServerStub.xml</DocumentationFile>
   </PropertyGroup>
 
 </Project>
