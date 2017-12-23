@@ -29,8 +29,7 @@ for:
 -
   branches:
     except:
-      - master
-
+     - master
   dotnet_csproj:
    patch: true
    file: '**\*.csproj'
