@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SmtpServerStub.Enums;
 
-namespace SmtpServerStub.SmtpApplication
+namespace SmtpServerStub.Utilities
 {
 	internal static class ServerStatusCodesConverter
     {

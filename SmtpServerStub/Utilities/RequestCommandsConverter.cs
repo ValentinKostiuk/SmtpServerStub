@@ -1,8 +1,8 @@
 ﻿using SmtpServerStub.Enums;
 
-namespace SmtpServerStub.SmtpApplication
+namespace SmtpServerStub.Utilities
 {
-	public static class RequestCommandsConverter
+    internal static class RequestCommandsConverter
     {
 		public static RequestCommands ToRequestCommandCode(string commandText)
 		{

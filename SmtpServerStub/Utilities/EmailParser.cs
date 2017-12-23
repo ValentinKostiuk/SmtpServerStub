@@ -6,16 +6,16 @@ using System.Text.RegularExpressions;
 
 namespace SmtpServerStub.Utilities
 {
-    public static class EmailParser
+    internal static class EmailParser
     {
-        public static Regex MailAndNameReges =
+        private static readonly Regex MailAndNameReges =
             new Regex(@"(?:\s*[""'](?<name>.+?)[""']\s*)?<?(?<address>[^<>]+)>?\s*",
                 RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-        public static Regex CcStringRegex = new Regex("(?s)^Cc:\\s*(.+?)\\w+:.+",
+        private static readonly Regex CcStringRegex = new Regex("(?s)^Cc:\\s*(.+?)\\w+:.+",
             RegexOptions.Multiline | RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public static Regex ToStringRegex = new Regex("(?s)^To:\\s*(.+?)\\w+:.+",
+        private static readonly Regex ToStringRegex = new Regex("(?s)^To:\\s*(.+?)\\w+:.+",
             RegexOptions.Multiline | RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static MailAddress ParseEmailFromRecipientCommand(string commandStr)
