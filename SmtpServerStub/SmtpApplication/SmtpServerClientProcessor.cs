@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using SmtpServerStub.Dtos;
 using SmtpServerStub.Enums;
@@ -143,7 +142,7 @@ namespace SmtpServerStub.SmtpApplication
             _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.StrtInputEndWith));
             var messageData = new StringBuilder();
 
-            string strMessage = _clientController.Read();
+            var strMessage = _clientController.Read();
             _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
 
             while (!strMessage.EndsWith("\r\n.\r\n"))

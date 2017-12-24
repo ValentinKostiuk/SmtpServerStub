@@ -10,6 +10,14 @@ namespace SmtpServerStub.SmtpApplication
     /// <inheritdoc />
     public class SmtpServer : ISmtpServer
     {
+        /// <summary>
+        /// </summary>
+        public delegate void EmailReceived(MailMessage mailMessage);
+
+        /// <summary>
+        /// </summary>
+        public event EmailReceived OnEmailReceived;
+
         private readonly TcpListener _tcpListener;
         private readonly ISmtpServerClientHandlerFactory _clientHandlerFactory;
         private readonly List<IMailMessage> _receivedMessages;
@@ -34,9 +42,11 @@ namespace SmtpServerStub.SmtpApplication
             {
                 var client = _tcpListener.AcceptTcpClient();
                 var handler = _clientHandlerFactory.Create(client);
-                var task = new Task<IMailMessage>(handler.Run);
+                var task = new Task<MailMessage>(handler.Run);
                 task.Start();
+
                 _receivedMessages.Add(task.Result);
+                OnEmailReceived?.Invoke(task.Result);
             }
         }
 
