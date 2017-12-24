@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using SmtpServerStub.Enums;
+using SmtpServerStub.Utilities.Interfaces;
 
 namespace SmtpServerStub.Utilities
 {
-	internal static class ServerStatusCodesConverter
-    {
+	internal class ServerStatusCodesConverter : IServerStatusCodesConverter
+	{
 		private static readonly Dictionary<ResponseCodes, string> CommandsTemplates = new Dictionary<ResponseCodes, string>
 		{
 			{ResponseCodes.NonStdSuccess, "200 Nonstandard success"},
@@ -35,7 +36,7 @@ namespace SmtpServerStub.Utilities
 			{ResponseCodes.TransactionFailed, "554 Transaction failed"}
 		};
 
-		public static string GetTextResponseForStatus(ResponseCodes code, params string[] args)
+		public virtual string GetTextResponseForStatus(ResponseCodes code, params string[] args)
 		{
 			var template = CommandsTemplates[code];
 			template = string.Format(template, args);

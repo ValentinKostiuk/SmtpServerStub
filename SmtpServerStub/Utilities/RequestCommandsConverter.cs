@@ -1,10 +1,11 @@
 ﻿using SmtpServerStub.Enums;
+using SmtpServerStub.Utilities.Interfaces;
 
 namespace SmtpServerStub.Utilities
 {
-    internal static class RequestCommandsConverter
+    internal class RequestCommandsConverter : IRequestCommandsConverter
     {
-		public static RequestCommands ToRequestCommandCode(string commandText)
+		public virtual RequestCommands ToRequestCommandCode(string commandText)
 		{
 			if (commandText.StartsWith("EHLO") || commandText.StartsWith("HELO"))
 			{

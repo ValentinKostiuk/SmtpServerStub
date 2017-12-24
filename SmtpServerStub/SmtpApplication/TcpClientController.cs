@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using SmtpServerStub.Dtos;
 using SmtpServerStub.SmtpApplication.Interfaces;
 
 namespace SmtpServerStub.SmtpApplication
@@ -17,9 +17,11 @@ namespace SmtpServerStub.SmtpApplication
         private readonly X509Certificate _certificate;
         private readonly NetworkStream _networkStream;
         private bool _switchedToSsl;
+        public ILogger Logger { get; set; }
 
-        public TcpClientController(TcpClient client, X509Certificate certificate)
+        public TcpClientController(TcpClient client, X509Certificate certificate, ILogger logger)
         {
+            Logger = logger;
             _client = client;
             _certificate = certificate;
             _networkStream = _client.GetStream();
@@ -35,19 +37,21 @@ namespace SmtpServerStub.SmtpApplication
             }
             catch (AuthenticationException e)
             {
-                Console.WriteLine("Exception: {0}", e.Message);
+                Logger.LogError(string.Format("Exception: {0}\n", e.Message));
                 if (e.InnerException != null)
                 {
-                    Console.WriteLine("Inner exception: {0}", e.InnerException.Message);
+                    Logger.LogError(string.Format("Inner exception: {0}\n", e.InnerException.Message));
                 }
-                Console.WriteLine("Authentication failed - closing the connection.");
+                Logger.LogError("Authentication failed - closing the connection.");
+                Close();
+                throw;
             }
         }
 
         public void Write(string message)
         {
             var stream = _switchedToSsl ? _sslStream : (Stream) _networkStream;
-            var encoder = new ASCIIEncoding();
+            var encoder = new UTF8Encoding();
             var buffer = encoder.GetBytes(message + "\r\n");
 
             stream.Write(buffer, 0, buffer.Length);
@@ -70,7 +74,6 @@ namespace SmtpServerStub.SmtpApplication
             } while (_networkStream.DataAvailable);
 
             var result = messageData.ToString();
-            Console.WriteLine(result);
             return result;
         }
 

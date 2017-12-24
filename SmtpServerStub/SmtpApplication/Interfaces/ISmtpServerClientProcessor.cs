@@ -4,6 +4,6 @@ namespace SmtpServerStub.SmtpApplication.Interfaces
 {
     internal interface ISmtpServerClientProcessor
     {
-        IMailMessage Run();
+        MailMessage Run();
     }
 }

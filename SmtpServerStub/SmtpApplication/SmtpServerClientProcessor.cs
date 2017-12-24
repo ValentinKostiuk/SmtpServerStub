@@ -1,22 +1,32 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using SmtpServerStub.Dtos;
 using SmtpServerStub.Enums;
 using SmtpServerStub.SmtpApplication.Interfaces;
 using SmtpServerStub.Utilities;
+using SmtpServerStub.Utilities.Interfaces;
 
 namespace SmtpServerStub.SmtpApplication
 {
     internal class SmtpServerClientProcessor : ISmtpServerClientProcessor
     {
         private readonly ITcpClientController _clientController;
+        public IEmailParser EmailParser { get; set; }
+        public IRequestCommandsConverter RequestCommandsConverter { get; set; }
+        public IServerStatusCodesConverter ServerStatusCodesConverter { get; set; }
+        public ILogger Logger { get; set; }
 
-        public SmtpServerClientProcessor(ITcpClientController clientController)
+        public SmtpServerClientProcessor(ITcpClientController clientController, ILogger logger)
         {
             _clientController = clientController;
+            EmailParser = new EmailParser();
+            RequestCommandsConverter = new RequestCommandsConverter();
+            ServerStatusCodesConverter = new ServerStatusCodesConverter();
+            Logger = logger;
         }
 
-        public IMailMessage Run()
+        public MailMessage Run()
         {
             SendServerReady();
             return ReceiveMessage();
@@ -62,6 +72,7 @@ namespace SmtpServerStub.SmtpApplication
                 }
             } while (!processingFinished);
 
+            _clientController.Close();
             return message;
         }
 
@@ -131,13 +142,15 @@ namespace SmtpServerStub.SmtpApplication
         {
             _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.StrtInputEndWith));
             var messageData = new StringBuilder();
-            string strMessage;
 
-            do
+            string strMessage = _clientController.Read();
+            _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
+
+            while (!strMessage.EndsWith("\r\n.\r\n"))
             {
-                strMessage = _clientController.Read();
                 messageData.Append(strMessage);
-            } while (!strMessage.EndsWith("\r\n.\r\n"));
+                strMessage = _clientController.Read();
+            }
 
             var msgDataStr = messageData.ToString();
 
@@ -159,6 +172,8 @@ namespace SmtpServerStub.SmtpApplication
                     message.To.Add(a);
                 }
             });
+
+            //Console.WriteLine("\n\n\n----------------------------\n\n\n" + messageData.ToString() + "----------------------------\n\n\n");
 
             _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
             return true;

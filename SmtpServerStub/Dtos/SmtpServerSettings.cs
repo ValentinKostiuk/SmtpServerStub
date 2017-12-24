@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SmtpServerStub.Dtos
 {
@@ -13,8 +14,7 @@ namespace SmtpServerStub.Dtos
 
         public IPAddress IpAddress { get; set; }
         public int Port { get; set; }
-        public string SslCertificateFilePath { get; set; }
+        public X509Certificate Certificate { get; set; }
         public bool EnableLogging { get; set; }
-        public string SslCertificatePassword { get; set; }
     }
 }
