@@ -9,6 +9,12 @@ namespace SmtpServerStub.SmtpApplication.Interfaces
     public interface ISmtpServer
     {
         /// <summary>
+        /// Event raised when server completely received new e-mail.
+        /// Handler should implement <see cref="EmailReceivedEventHandler"/>
+        /// </summary>
+        event EmailReceivedEventHandler OnEmailReceived;
+
+        /// <summary>
         /// Starts server. Creates new TcpListener.
         /// Usually should be started in separate Thread:
         /// Thread = new Thread(Server.Start);

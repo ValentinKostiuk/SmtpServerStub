@@ -7,21 +7,22 @@ using SmtpServerStub.SmtpApplication.Interfaces;
 
 namespace SmtpServerStub.SmtpApplication
 {
+    /// <summary> 
+    /// <param name="sender">Is current <see cref="ISmtpServer"/></param>
+    /// <param name="e">Event argument of type <see cref="EmailReceivedEventArgs"/></param>
+    /// </summary>
+    public delegate void EmailReceivedEventHandler(ISmtpServer sender, EmailReceivedEventArgs e);
+
     /// <inheritdoc />
     public class SmtpServer : ISmtpServer
     {
-        /// <summary>
-        /// </summary>
-        public delegate void EmailReceived(MailMessage mailMessage);
-
-        /// <summary>
-        /// </summary>
-        public event EmailReceived OnEmailReceived;
-
         private readonly TcpListener _tcpListener;
         private readonly ISmtpServerClientHandlerFactory _clientHandlerFactory;
         private readonly List<IMailMessage> _receivedMessages;
         private readonly ILogger _logger;
+
+        /// <inheritdoc />
+        public event EmailReceivedEventHandler OnEmailReceived;
 
         /// <inheritdoc />
         public SmtpServer(ISmtpServerSettings settings, ILogger logger = null)
@@ -46,7 +47,10 @@ namespace SmtpServerStub.SmtpApplication
                 task.Start();
 
                 _receivedMessages.Add(task.Result);
-                OnEmailReceived?.Invoke(task.Result);
+                OnEmailReceived?.Invoke(this, new EmailReceivedEventArgs
+                {
+                    MailMessage = task.Result
+                });
             }
         }
 
