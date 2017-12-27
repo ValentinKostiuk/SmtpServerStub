@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net.Mail;
 using System.Net.Mime;
@@ -18,13 +19,13 @@ namespace SmtpServerStub.Dtos
         //     A System.Net.Mail.MailAddress that contains the sender's address information.
         MailAddress Sender { get; set; }
 
-        //
-        // Summary:
-        //     Gets or sets the list of addresses to reply to for the mail message.
-        //
-        // Returns:
-        //     The list of the addresses to reply to for the mail message.
-        MailAddressCollection ReplyToList { get; }
+		//
+		// Summary:
+		//     Gets or sets the list of addresses to reply to for the mail message.
+		//
+		// Returns:
+		//     The list of the addresses to reply to for the mail message.
+		List<MailAddress> ReplyToList { get; set; }
 
         //
         // Summary:
@@ -58,7 +59,7 @@ namespace SmtpServerStub.Dtos
         // Returns:
         //     A System.Collections.Specialized.NameValueCollection that contains the e-mail
         //     headers.
-        NameValueCollection Headers { get; }
+        NameValueCollection Headers { get; set; }
 
         //
         // Summary:
@@ -68,14 +69,14 @@ namespace SmtpServerStub.Dtos
         //     A System.Net.Mail.MailAddress that contains the from address information.
         MailAddress From { get; set; }
 
-        //
-        // Summary:
-        //     Gets the address collection that contains the carbon copy (CC) recipients for
-        //     this e-mail message.
-        //
-        // Returns:
-        //     A writable System.Net.Mail.MailAddressCollection object.
-        MailAddressCollection CC { get; }
+		//
+		// Summary:
+		//     Gets the address collection that contains the carbon copy (CC) recipients for
+		//     this e-mail message.
+		//
+		// Returns:
+		//     A writable System.Net.Mail.MailAddressCollection object.
+		List<MailAddress> CC { get; set; }
 
         //
         // Summary:
@@ -111,14 +112,14 @@ namespace SmtpServerStub.Dtos
         //     A System.String value that contains the body text.
         string Body { get; set; }
 
-        //
-        // Summary:
-        //     Gets the address collection that contains the blind carbon copy (BCC) recipients
-        //     for this e-mail message.
-        //
-        // Returns:
-        //     A writable System.Net.Mail.MailAddressCollection object.
-        MailAddressCollection Bcc { get; }
+		//
+		// Summary:
+		//     Gets the address collection that contains the blind carbon copy (BCC) recipients
+		//     for this e-mail message.
+		//
+		// Returns:
+		//     A writable System.Net.Mail.MailAddressCollection object.
+		List<MailAddress> Bcc { get; set; }
 
         //TODO: implement attachment collection
         //
@@ -147,20 +148,28 @@ namespace SmtpServerStub.Dtos
         //     notifications for this message.
         DeliveryNotificationOptions DeliveryNotificationOptions { get; set; }
 
-        //
-        // Summary:
-        //     Gets the address collection that contains the recipients of this e-mail message.
-        //
-        // Returns:
-        //     A writable System.Net.Mail.MailAddressCollection object.
-        MailAddressCollection To { get; }
-        
-        //
-        // Summary:
-        //     Date header of received E-mail message
-        //
-        // Returns:
-        //     DateTime
+		//
+		// Summary:
+		//     Gets the address collection that contains the recipients of this e-mail message.
+		//
+		// Returns:
+		//     A writable System.Net.Mail.MailAddressCollection object.
+		List<MailAddress> To { get; set; }
+
+		//
+		// Summary:
+		//     Date header of received E-mail message
+		//
+		// Returns:
+		//     DateTime
         DateTime DateSent { get; set; }
-    }
+
+		//
+		// Summary:
+		//     Returns whole content of DATA SMTP protocol part (content of message including headers and attachments)
+		//
+		// Returns:
+		//     string
+		string MailMessageDataSection { get; set; }
+	}
 }
