@@ -96,7 +96,7 @@ namespace SmtpServerStub.SmtpApplication
 			}
 			catch (Exception e)
 			{
-				Logger.LogError(string.Format("Exception ocurred while switching to TLS:\n{0}", e.Message));
+				Logger.LogError(string.Format("Exception occurred while switching to TLS:\n{0}", e.Message));
 				return true;
 			}
 			return false;
