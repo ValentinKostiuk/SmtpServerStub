@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
+using System.Runtime.CompilerServices;
 using System.Text;
 using SmtpServerStub.Dtos;
 using SmtpServerStub.Enums;
@@ -10,6 +11,8 @@ using SmtpServerStub.Utilities;
 using SmtpServerStub.Utilities.Interfaces;
 using MailMessage = SmtpServerStub.Dtos.MailMessage;
 
+[assembly: InternalsVisibleTo("SmtpServerStubUnitTests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace SmtpServerStub.SmtpApplication
 {
 	internal class SmtpServerClientProcessor : ISmtpServerClientProcessor
@@ -183,7 +186,7 @@ namespace SmtpServerStub.SmtpApplication
 
 			foreach (var a in list2)
 			{
-				var to = list2.FirstOrDefault(address => Equals(address, a));
+				var to = list1.FirstOrDefault(address => Equals(address, a));
 				var indexOfTo = list2.IndexOf(to);
 				if (indexOfTo != -1)
 				{
