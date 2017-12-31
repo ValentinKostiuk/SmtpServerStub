@@ -17,7 +17,7 @@
    file_version: '{version}'
    informational_version: '{version}'
   build_script:
-   - msbuild /t:pack /v:q
+   - msbuild SmtpServerStub\SmtpServerStub.csproj /t:pack /v:q
   artifacts:
    - path: '**\*.nupkg'
   deploy:
@@ -46,7 +46,7 @@
    file_version: '{version}'
    informational_version: '{version}'
   build_script:
-   - msbuild /t:pack /v:q
+   - msbuild SmtpServerStub\SmtpServerStub.csproj /t:pack /v:q
   artifacts:
    - path: '**\*.nupkg'
   deploy:
