@@ -48,7 +48,7 @@
    informational_version: '{version}'
   build_script:
    - msbuild SmtpServerStub\SmtpServerStub.csproj /t:pack /v:q
-   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /t:compile /v:q
+   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /t:compile /v:n
   test_script:
    - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe" -targetargs:"SmtpServerStubUnitTests\bin\Debug\SmtpServerStubUnitTests.dll" -filter:"+[SmtpServerStub*]* -[Tests*]*"
   after_test:
