@@ -8,6 +8,7 @@
 		SrvReady,
 		SrvClosingChannel,
         SrvHello,
+        SrvHelloNoTls,
 		RqstActOkCompleted,
 		UsrWillForward,
 		CantVrfyUserAttemptDelivery,

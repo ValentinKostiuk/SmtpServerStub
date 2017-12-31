@@ -87,7 +87,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
             _requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.RcptTo, RequestCommands.Quit);
             _emailParser.ParseEmailFromRecipientCommand(readLine).Returns(expectedAddress);
             _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted).Returns("response1");
-            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted, HostName).Returns("response2");
+            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, HostName).Returns("response2");
             _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, HostName).Returns("response3");
 
             //act
@@ -96,7 +96,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
             //assert
             message.To[0].Should().Be(expectedAddress);
             _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted);
-            _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted, HostName);
+            _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, HostName);
             _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.SrvReady, HostName);
             _clientController.Received(1).Write("response1");
             _clientController.Received(1).Write("response2");
@@ -113,7 +113,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
             _requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.RcptTo, RequestCommands.Quit);
             _emailParser.ParseEmailFromRecipientCommand(readLine).ThrowsForAnyArgs(new Exception("parse error message"));
             _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.MbNameNotAllowed).Returns("response1");
-            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted, HostName).Returns("response2");
+            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, HostName).Returns("response2");
             _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, HostName).Returns("response3");
 
             //act
@@ -122,7 +122,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
             //assert
             message.To.Count.Should().Be(0);
             _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.MbNameNotAllowed);
-            _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted, HostName);
+            _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, HostName);
             _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.SrvReady, HostName);
             _clientController.Received(1).Write("response1");
             _clientController.Received(1).Write("response2");
@@ -137,7 +137,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 
             _clientController.Read().Returns(readLine);
             _requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.StartTls, RequestCommands.Quit);
-            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted, HostName).Returns("response1");
+            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, HostName).Returns("response1");
             _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, HostName).Returns("response2");
 
             //act
@@ -145,7 +145,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 
             //assert
             _clientController.Received(1).SwitchToTlsProtocol();
-            _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted, HostName);
+            _serverStatusCodesConverter.Received(1).GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, HostName);
             _serverStatusCodesConverter.Received(2).GetTextResponseForStatus(ResponseCodes.SrvReady, HostName);
             _clientController.Received(1).Write("response1");
             _clientController.Received(2).Write("response2");
@@ -160,7 +160,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
             _clientController.Read().Returns(readLine);
             _requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.StartTls, RequestCommands.Quit);
             _clientController.When(x => x.SwitchToTlsProtocol()).Do(x => throw new Exception("happens some times"));
-            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted, HostName).Returns("response1");
+            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, HostName).Returns("response1");
             _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, HostName).Returns("response2");
             _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.AccessDenied).Returns("response3");
 
@@ -170,9 +170,29 @@ namespace SmtpServerStubUnitTests.SmtpApplication
             //assert
             _clientController.Received(1).SwitchToTlsProtocol();
             _logger.Received(1).LogError("Exception occurred while switching to TLS:\nhappens some times");
+            _clientController.Received(2).Write("response2");
+            _clientController.Received(1).Write("response1");
+            _clientController.Received(1).Write("response3");
+        }
+
+        [Test]
+        public void Run_RespondsWithCorrectHelloIfTlsIsAvailable()
+        {
+            //arrange
+            var readLine = "not empty string";
+
+            _clientController.Read().Returns(readLine);
+            _clientController.IsTlsAvailable.Returns(true);
+            _requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.Quit);
+            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHello, HostName).Returns("response1");
+            _serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, HostName).Returns("response2");
+
+            //act
+            _clientProcessor.Run();
+
+            //assert
             _clientController.Received(1).Write("response1");
             _clientController.Received(1).Write("response2");
-            _clientController.Received(1).Write("response3");
         }
     }
 }

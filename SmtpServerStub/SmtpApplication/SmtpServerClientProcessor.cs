@@ -91,7 +91,8 @@ namespace SmtpServerStub.SmtpApplication
 
 		private bool SwitchToTls(MailMessage message, string nextLine)
 		{
-			try
+		    _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _clientController.HostName));
+            try
 			{
 				_clientController.SwitchToTlsProtocol();
 			}
@@ -101,7 +102,6 @@ namespace SmtpServerStub.SmtpApplication
 			    _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.AccessDenied));
                 return true;
 			}
-            _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _clientController.HostName));
             return false;
 		}
 
@@ -112,7 +112,7 @@ namespace SmtpServerStub.SmtpApplication
 
 		private bool HandleHello(MailMessage message, string nextLine)
 		{
-			var responseStatus = _clientController.IsTlsAvailable ? ResponseCodes.SrvHello : ResponseCodes.RqstActOkCompleted;
+			var responseStatus = _clientController.IsTlsAvailable ? ResponseCodes.SrvHello : ResponseCodes.SrvHelloNoTls;
 			var response = ServerStatusCodesConverter.GetTextResponseForStatus(responseStatus, _clientController.HostName);
 			_clientController.Write(response);
 			return false;
@@ -172,12 +172,12 @@ namespace SmtpServerStub.SmtpApplication
 				strMessage = _clientController.Read();
 			}
 
-			var msgDataStr = messageData.ToString();
-			var cc = EmailParser.ParseEmailsFromDataCc(msgDataStr);
-			var toList = MergeToList(message.To, EmailParser.ParseEmailsFromDataTo(msgDataStr));
+//			var msgDataStr = messageData.ToString();
+//			var cc = EmailParser.ParseEmailsFromDataCc(msgDataStr);
+//			var toList = MergeToList(message.To, EmailParser.ParseEmailsFromDataTo(msgDataStr));
 
-			message.To = toList;
-			message.CC = cc;
+//			message.To = toList;
+//			message.CC = cc;
 
 			//Console.WriteLine("\n\n\n----------------------------\n\n\n" + messageData.ToString() + "----------------------------\n\n\n");
 
