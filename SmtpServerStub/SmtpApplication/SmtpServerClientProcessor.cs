@@ -171,15 +171,16 @@ namespace SmtpServerStub.SmtpApplication
 				messageData.Append(strMessage);
 				strMessage = _clientController.Read();
 			}
+			messageData.Append(strMessage);
 
-//			var msgDataStr = messageData.ToString();
-//			var cc = EmailParser.ParseEmailsFromDataCc(msgDataStr);
+			var msgDataStr = messageData.ToString();
+			var cc = EmailParser.ParseEmailsFromDataCc(msgDataStr);
 //			var toList = MergeToList(message.To, EmailParser.ParseEmailsFromDataTo(msgDataStr));
 
 //			message.To = toList;
-//			message.CC = cc;
+			message.CC = cc;
 
-			//Console.WriteLine("\n\n\n----------------------------\n\n\n" + messageData.ToString() + "----------------------------\n\n\n");
+			Console.WriteLine("\n\n\n----------------------------\n\n\n" + messageData.ToString() + "----------------------------\n\n\n");
 
 			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
 			return true;
