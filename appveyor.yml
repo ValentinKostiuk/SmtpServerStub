@@ -10,7 +10,7 @@
    - nuget restore
   dotnet_csproj:
    patch: true
-   file: '**\*.csproj'
+   file: '**\SmtpServerStub.csproj'
    version: '{version}'
    package_version: '{version}'
    assembly_version: '{version}'
@@ -39,7 +39,7 @@
    - nuget restore
   dotnet_csproj:
    patch: true
-   file: '**\*.csproj'
+   file: '**\SmtpServerStub.csproj'
    version: '{version}'
    package_version: '{version}-{branch}'
    assembly_version: '{version}'
