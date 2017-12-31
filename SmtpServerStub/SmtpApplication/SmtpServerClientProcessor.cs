@@ -91,8 +91,6 @@ namespace SmtpServerStub.SmtpApplication
 
 		private bool SwitchToTls(MailMessage message, string nextLine)
 		{
-			var response = ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _clientController.HostName);
-			_clientController.Write(response);
 			try
 			{
 				_clientController.SwitchToTlsProtocol();
@@ -100,9 +98,11 @@ namespace SmtpServerStub.SmtpApplication
 			catch (Exception e)
 			{
 				Logger.LogError(string.Format("Exception occurred while switching to TLS:\n{0}", e.Message));
-				return true;
+			    _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.AccessDenied));
+                return true;
 			}
-			return false;
+            _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _clientController.HostName));
+            return false;
 		}
 
 		private bool HandleQuit(MailMessage message, string nextLine)
@@ -120,38 +120,43 @@ namespace SmtpServerStub.SmtpApplication
 
 		private bool HandleMailTo(MailMessage message, string nextLine)
 		{
-			try
+		    MailAddress recipient;
+
+            try
 			{
-				var recipient = EmailParser.ParseEmailFromRecipientCommand(nextLine);
-				if (message.To.All(a => a.Address != recipient.Address))
-				{
-					message.To.Add(recipient);
-				}
-				_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
-				return false;
+			    recipient = EmailParser.ParseEmailFromRecipientCommand(nextLine);
 			}
 			catch
 			{
 				_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.MbNameNotAllowed));
 				return true;
 			}
-		}
+
+		    if (message.To.All(a => a.Address != recipient.Address))
+		    {
+		        message.To.Add(recipient);
+		    }
+		    _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
+		    return false;
+        }
 
 		private bool HandleMailFrom(MailMessage message, string nextLine)
 		{
-			try
+		    MailAddress sender;
+		    try
 			{
-				var sender = EmailParser.ParseEmailFromRecipientCommand(nextLine);
-				message.From = sender;
-				_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
-				return false;
-			}
+			    sender = EmailParser.ParseEmailFromRecipientCommand(nextLine);
+            }
 			catch
 			{
 				_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.MbNameNotAllowed));
 				return true;
 			}
-		}
+
+		    message.From = sender;
+		    _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
+		    return false;
+        }
 
 		private bool HandleDataSection(MailMessage message, string nextLine)
 		{
