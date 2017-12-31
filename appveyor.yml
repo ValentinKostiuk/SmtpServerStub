@@ -18,7 +18,7 @@
    informational_version: '{version}'
   build_script:
    - msbuild SmtpServerStub\SmtpServerStub.csproj /t:pack /v:q
-   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /t:compile /v:q
+   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q
   artifacts:
    - path: '**\*.nupkg'
   deploy:
@@ -48,9 +48,9 @@
    informational_version: '{version}'
   build_script:
    - msbuild SmtpServerStub\SmtpServerStub.csproj /t:pack /v:q
-   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:n
+   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q
   test_script:
-   - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe" -targetargs:"SmtpServerStubUnitTests\bin\Debug\SmtpServerStubUnitTests.dll" -filter:"+[SmtpServerStub*]* -[Tests*]*"
+   - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe" -targetargs:"SmtpServerStubUnitTests\bin\Debug\SmtpServerStubUnitTests.dll" -filter:"+[SmtpServerStub*]* -[SmtpServerStubUnitTests*]*"
   after_test:
    - ps: |
        $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
