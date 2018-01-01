@@ -7,7 +7,7 @@ namespace SmtpServerStub.Dtos
     {
         IPAddress IpAddress { get; set; }
         int Port { get; set; }
-        X509Certificate Certificate { get; set; }
+        X509Certificate2 Certificate { get; set; }
         bool EnableLogging { get; set; }
     }
 }

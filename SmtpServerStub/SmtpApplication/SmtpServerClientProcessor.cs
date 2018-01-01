@@ -13,6 +13,7 @@ using MailMessage = SmtpServerStub.Dtos.MailMessage;
 
 [assembly: InternalsVisibleTo("SmtpServerStubUnitTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
 namespace SmtpServerStub.SmtpApplication
 {
 	internal class SmtpServerClientProcessor : ISmtpServerClientProcessor
@@ -91,18 +92,18 @@ namespace SmtpServerStub.SmtpApplication
 
 		private bool SwitchToTls(MailMessage message, string nextLine)
 		{
-		    _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _clientController.HostName));
-            try
+			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _clientController.HostName));
+			try
 			{
 				_clientController.SwitchToTlsProtocol();
 			}
 			catch (Exception e)
 			{
 				Logger.LogError(string.Format("Exception occurred while switching to TLS:\n{0}", e.Message));
-			    _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.AccessDenied));
-                return true;
+				_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.AccessDenied));
+				return true;
 			}
-            return false;
+			return false;
 		}
 
 		private bool HandleQuit(MailMessage message, string nextLine)
@@ -120,11 +121,11 @@ namespace SmtpServerStub.SmtpApplication
 
 		private bool HandleMailTo(MailMessage message, string nextLine)
 		{
-		    MailAddress recipient;
+			MailAddress recipient;
 
-            try
+			try
 			{
-			    recipient = EmailParser.ParseEmailFromRecipientCommand(nextLine);
+				recipient = EmailParser.ParseEmailFromRecipientCommand(nextLine);
 			}
 			catch
 			{
@@ -132,31 +133,31 @@ namespace SmtpServerStub.SmtpApplication
 				return true;
 			}
 
-		    if (message.To.All(a => a.Address != recipient.Address))
-		    {
-		        message.To.Add(recipient);
-		    }
-		    _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
-		    return false;
-        }
+			if (message.To.All(a => a.Address != recipient.Address))
+			{
+				message.To.Add(recipient);
+			}
+			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
+			return false;
+		}
 
 		private bool HandleMailFrom(MailMessage message, string nextLine)
 		{
-		    MailAddress sender;
-		    try
+			MailAddress sender;
+			try
 			{
-			    sender = EmailParser.ParseEmailFromRecipientCommand(nextLine);
-            }
+				sender = EmailParser.ParseEmailFromRecipientCommand(nextLine);
+			}
 			catch
 			{
 				_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.MbNameNotAllowed));
 				return true;
 			}
 
-		    message.From = sender;
-		    _clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
-		    return false;
-        }
+			message.From = sender;
+			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
+			return false;
+		}
 
 		private bool HandleDataSection(MailMessage message, string nextLine)
 		{
@@ -175,34 +176,27 @@ namespace SmtpServerStub.SmtpApplication
 
 			var msgDataStr = messageData.ToString();
 			var cc = EmailParser.ParseEmailsFromDataCc(msgDataStr);
-//			var toList = MergeToList(message.To, EmailParser.ParseEmailsFromDataTo(msgDataStr));
+			var parsedToList = EmailParser.ParseEmailsFromDataTo(msgDataStr);
+			var toList = MergeToList(message.To, parsedToList);
 
-//			message.To = toList;
+			message.To = toList;
 			message.CC = cc;
 
-			Console.WriteLine("\n\n\n----------------------------\n\n\n" + messageData.ToString() + "----------------------------\n\n\n");
+			Console.WriteLine("\n\n\n----------------------------\n\n\n" + messageData + "----------------------------\n\n\n");
 
 			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
-			return true;
+			return false;
 		}
 
 		private List<MailAddress> MergeToList(IList<MailAddress> list1, IList<MailAddress> list2)
 		{
-			var resultList = new List<MailAddress>();
-
-			foreach (var a in list2)
+			if (list2 == null || list2.Count == 0)
 			{
-				var to = list1.FirstOrDefault(address => Equals(address, a));
-				var indexOfTo = list2.IndexOf(to);
-				if (indexOfTo != -1)
-				{
-					resultList[indexOfTo] = a;
-				}
-				else
-				{
-					resultList.Add(a);
-				}
+				return list1.ToList();
 			}
+
+			var summary = list1.Concat(list2);
+			var resultList = summary.Where(a => summary.Count(x => x.Address == a.Address) == 1 || !string.IsNullOrEmpty(a.DisplayName)).ToList();
 
 			return resultList;
 		}

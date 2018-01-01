@@ -7,10 +7,10 @@ namespace SmtpServerStub.SmtpApplication
 {
     internal class TcpClientHandlerFactory : ISmtpServerClientHandlerFactory
     {
-        internal X509Certificate ServerCertificate { get; set; }
+        internal X509Certificate2 ServerCertificate { get; set; }
         internal ILogger _logger { get; set; }
 
-        public TcpClientHandlerFactory(X509Certificate certificate, ILogger logger)
+        public TcpClientHandlerFactory(X509Certificate2 certificate, ILogger logger)
         {
             ServerCertificate = certificate;
             _logger = logger;

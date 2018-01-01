@@ -14,12 +14,12 @@ namespace SmtpServerStub.SmtpApplication
 	{
 		private readonly TcpClient _client;
 		private readonly SslStream _sslStream;
-		private readonly X509Certificate _certificate;
+		private readonly X509Certificate2 _certificate;
 		private readonly NetworkStream _networkStream;
 		private bool _switchedToSsl;
 		public ILogger Logger { get; set; }
 
-		public TcpClientController(TcpClient client, X509Certificate certificate, ILogger logger)
+		public TcpClientController(TcpClient client, X509Certificate2 certificate, ILogger logger)
 		{
 			Logger = logger;
 			_client = client;
