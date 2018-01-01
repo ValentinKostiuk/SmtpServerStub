@@ -43,9 +43,19 @@ namespace SmtpServerStub.SmtpApplication
 		{
 			var message = new MailMessage();
 			var processingFinished = false;
-			do
+
+			while (!processingFinished)
 			{
-				var nextLine = _clientController.Read();
+				string nextLine;
+
+				try
+				{
+					nextLine = _clientController.Read();
+				}
+				catch
+				{
+					break;
+				}
 
 				if (nextLine.Length > 0)
 				{
@@ -77,7 +87,7 @@ namespace SmtpServerStub.SmtpApplication
 							break;
 					}
 				}
-			} while (!processingFinished);
+			}
 
 			_clientController.Close();
 			return message;

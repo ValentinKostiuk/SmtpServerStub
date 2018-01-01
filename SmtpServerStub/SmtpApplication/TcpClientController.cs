@@ -84,6 +84,7 @@ namespace SmtpServerStub.SmtpApplication
 			_networkStream.Flush();
 			_sslStream.Flush();
 			_client.Close();
+			_client.Dispose();
 		}
 
 		public string HostName
