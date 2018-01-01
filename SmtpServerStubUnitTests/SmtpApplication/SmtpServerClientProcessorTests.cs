@@ -257,7 +257,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 			_clientProcessor.Run();
 
 			//assert
-			_clientController.Received(5).Read();
+			_clientController.Received(6).Read();
 		}
 
 		[Test]
