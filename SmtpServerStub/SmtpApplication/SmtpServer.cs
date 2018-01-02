@@ -44,13 +44,17 @@ namespace SmtpServerStub.SmtpApplication
                 var client = _tcpListener.AcceptTcpClient();
                 var handler = _clientHandlerFactory.Create(client);
                 var task = new Task<MailMessage>(handler.Run);
-                task.Start();
 
-                _receivedMessages.Add(task.Result);
-                OnEmailReceived?.Invoke(this, new EmailReceivedEventArgs
-                {
-                    MailMessage = task.Result
-                });
+	            task.ContinueWith(t =>
+	            {
+		            _receivedMessages.Add(t.Result);
+		            OnEmailReceived?.Invoke(this, new EmailReceivedEventArgs
+		            {
+			            MailMessage = t.Result
+		            });
+	            });
+
+                task.Start();
             }
         }
 

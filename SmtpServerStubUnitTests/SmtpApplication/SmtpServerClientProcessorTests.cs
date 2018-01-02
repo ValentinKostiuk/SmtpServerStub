@@ -25,7 +25,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 
 		private readonly string _hostName = "ServerHost";
 
-		private readonly string _mailDataSection = "MIME-Version: 1.0\r\n" +
+		private readonly string _mailDataSection = "\r\nMIME-Version: 1.0\r\n" +
 		                                           "From: \"From Name\" <valentin.kostiuk@gmail.com>\r\n" +
 		                                           "To: \"To Name\" <valentin.kostiuk@gmail.com>\r\n" +
 		                                           "Cc: \"To Name\" <valentin.kostiuk@gmail.com>, \"To Name\"<valentin.kostiuk@gmail.com>\r\n" +
@@ -335,6 +335,34 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 
 			//assert
 			message.To.ShouldAllBeEquivalentTo(expectedCollection);
+		}
+
+		[Test]
+		public void Run_SetsDataSectionOfMail()
+		{
+			//arrange
+			var readLine = "not empty string";
+			_clientController.Read().Returns(readLine, readLine, _mailDataSection);
+			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.Data, RequestCommands.Quit);
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _hostName).Returns("response1");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, _hostName).Returns("response2");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.StrtInputEndWith).Returns("response3");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted).Returns("response4");
+
+			//act
+			var message = _clientProcessor.Run();
+
+			//assert
+			message.MailMessageDataSection.Should().Be("MIME-Version: 1.0\r\n" +
+			                                           "From: \"From Name\" <valentin.kostiuk@gmail.com>\r\n" +
+			                                           "To: \"To Name\" <valentin.kostiuk@gmail.com>\r\n" +
+			                                           "Cc: \"To Name\" <valentin.kostiuk@gmail.com>, \"To Name\"<valentin.kostiuk@gmail.com>\r\n" +
+			                                           "Date: 19 Dec 2017 17:36:49 +0200\r\n" +
+			                                           "Subject: Subject\r\n" +
+			                                           "Content-Type: text/plain; charset=us-ascii\r\n" +
+			                                           "Content-Transfer-Encoding: quoted-printable\r\n\r\n" +
+			                                           "Body of Message" +
+			                                           "\r\n.");
 		}
 	}
 }

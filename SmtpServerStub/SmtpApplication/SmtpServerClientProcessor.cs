@@ -191,6 +191,7 @@ namespace SmtpServerStub.SmtpApplication
 
 			message.To = toList;
 			message.CC = cc;
+			message.MailMessageDataSection = messageData.ToString().Trim();
 
 			Console.WriteLine("\n\n\n----------------------------\n\n\n" + messageData + "----------------------------\n\n\n");
 
