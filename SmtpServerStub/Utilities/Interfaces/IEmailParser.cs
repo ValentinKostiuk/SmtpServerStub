@@ -10,5 +10,6 @@ namespace SmtpServerStub.Utilities.Interfaces
         List<MailAddress> ParseEmailsFromString(string commandStr);
         List<MailAddress> ParseEmailsFromDataCc(string commandStr);
         List<MailAddress> ParseEmailsFromDataTo(string commandStr);
+	    string ParseBodyFromDataSection(string dataSection);
     }
 }

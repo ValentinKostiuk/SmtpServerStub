@@ -54,6 +54,7 @@ namespace SmtpServerStub.SmtpApplication
 				}
 				catch
 				{
+					Logger.LogWarning("Stream was closed before QUIT command from server");
 					break;
 				}
 
@@ -192,6 +193,8 @@ namespace SmtpServerStub.SmtpApplication
 			message.To = toList;
 			message.CC = cc;
 			message.MailMessageDataSection = messageData.ToString().Trim();
+
+			//TODO: set correct message.From name using data section headers
 
 			Console.WriteLine("\n\n\n----------------------------\n\n\n" + messageData + "----------------------------\n\n\n");
 

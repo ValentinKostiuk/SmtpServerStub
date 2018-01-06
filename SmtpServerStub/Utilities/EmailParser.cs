@@ -54,5 +54,10 @@ namespace SmtpServerStub.Utilities
             var match = ToStringRegex.Match(commandStr).Groups[1].Value;
             return ParseEmailsFromString(match);
         }
+
+	    public virtual string ParseBodyFromDataSection(string dataSection)
+	    {
+		    return "";
+	    }
     }
 }
