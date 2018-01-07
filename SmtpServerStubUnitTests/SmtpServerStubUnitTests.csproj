@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SmtpApplication\SmtpServerClientProcessorTests.cs" />
+    <Compile Include="Utilities\EmailParserTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

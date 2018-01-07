@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Net.Mail;
 using FluentAssertions;
 using NSubstitute;
@@ -62,13 +63,28 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 
 			_clientController.Read().Returns("not empty string");
 			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.MailFrom, RequestCommands.Quit);
-			_emailParser.ParseEmailFromRecipientCommand("not empty string").Returns(expectedAddress);
+			_emailParser.ParseEmailFromString("not empty string").Returns(expectedAddress);
 
 			//act
 			var message = _clientProcessor.Run();
 
 			//assert
 			message.From.Should().Be(expectedAddress);
+		}
+
+		[Test]
+		public void Run_ShouldLogExceptionIfReadIsUnsuccessfull()
+		{
+			//arrange
+			_clientController.Read().Returns("not empty string");
+			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.MailFrom, RequestCommands.Quit);
+			_clientController.When(cc => cc.Read()).Throw(new Exception("some read exception"));
+			
+			//act
+			_clientProcessor.Run();
+
+			//assert
+			_logger.Received(1).LogWarning("Stream was closed before QUIT command from server:\nsome read exception");
 		}
 
 		[Test]
@@ -79,7 +95,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 
 			_clientController.Read().Returns("not empty string");
 			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.MailFrom, RequestCommands.Quit);
-			_emailParser.ParseEmailFromRecipientCommand("not empty string").ThrowsForAnyArgs(new Exception("very incorrect e-mail"));
+			_emailParser.ParseEmailFromString("not empty string").ThrowsForAnyArgs(new Exception("very incorrect e-mail"));
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.MbNameNotAllowed).Returns("response with error");
 			//act
 			var message = _clientProcessor.Run();
@@ -98,7 +114,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 
 			_clientController.Read().Returns(readLine);
 			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.RcptTo, RequestCommands.Quit);
-			_emailParser.ParseEmailFromRecipientCommand(readLine).Returns(expectedAddress);
+			_emailParser.ParseEmailFromString(readLine).Returns(expectedAddress);
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted).Returns("response1");
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, _hostName).Returns("response2");
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _hostName).Returns("response3");
@@ -124,7 +140,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 
 			_clientController.Read().Returns(readLine);
 			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.RcptTo, RequestCommands.Quit);
-			_emailParser.ParseEmailFromRecipientCommand(readLine).ThrowsForAnyArgs(new Exception("parse error message"));
+			_emailParser.ParseEmailFromString(readLine).ThrowsForAnyArgs(new Exception("parse error message"));
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.MbNameNotAllowed).Returns("response1");
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, _hostName).Returns("response2");
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _hostName).Returns("response3");
@@ -223,7 +239,7 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.StrtInputEndWith).Returns("response3");
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted).Returns("response4");
 
-			_emailParser.ParseEmailsFromDataCc(_mailDataSection).Returns(expectedCollection);
+			_emailParser.ParseEmailsFromDataCc(Arg.Any<NameValueCollection>()).Returns(expectedCollection);
 
 			//act
 			var message = _clientProcessor.Run();
@@ -293,8 +309,8 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, _hostName).Returns("response2");
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.StrtInputEndWith).Returns("response3");
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted).Returns("response4");
-			_emailParser.ParseEmailsFromDataTo(_mailDataSection).Returns(parsedFromHeaderCollection);
-			_emailParser.ParseEmailFromRecipientCommand(readLine).Returns(toAddress);
+			_emailParser.ParseEmailsFromDataTo(Arg.Any<NameValueCollection>()).Returns(parsedFromHeaderCollection);
+			_emailParser.ParseEmailFromString(readLine).Returns(toAddress);
 
 			//act
 			var message = _clientProcessor.Run();
@@ -327,8 +343,8 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, _hostName).Returns("response2");
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.StrtInputEndWith).Returns("response3");
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted).Returns("response4");
-			_emailParser.ParseEmailsFromDataTo(_mailDataSection).Returns(new List<MailAddress>());
-			_emailParser.ParseEmailFromRecipientCommand(readLine).Returns(toAddress);
+			_emailParser.ParseEmailsFromDataTo(Arg.Any<NameValueCollection>()).Returns(new List<MailAddress>());
+			_emailParser.ParseEmailFromString(readLine).Returns(toAddress);
 
 			//act
 			var message = _clientProcessor.Run();
@@ -363,6 +379,87 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 			                                           "Content-Transfer-Encoding: quoted-printable\r\n\r\n" +
 			                                           "Body of Message" +
 			                                           "\r\n.");
+		}
+
+		[Test]
+		public void Run_ShoulSetBody()
+		{
+			//arrange
+			var readLine = "not empty string";
+			var parsedBody = "parsedBodyString";
+
+			_clientController.Read().Returns(readLine, readLine, readLine, _mailDataSection);
+			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(
+				RequestCommands.Hello,
+				RequestCommands.RcptTo,
+				RequestCommands.Data,
+				RequestCommands.Quit);
+
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _hostName).Returns("response1");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, _hostName).Returns("response2");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.StrtInputEndWith).Returns("response3");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted).Returns("response4");
+			_emailParser.ParseBodyFromDataSection(_mailDataSection).Returns(parsedBody);
+
+			//act
+			var message = _clientProcessor.Run();
+
+			//assert
+			message.Body.Should().Be(parsedBody);
+		}
+
+		[Test]
+		public void Run_ShoulSetSubject()
+		{
+			//arrange
+			var readLine = "not empty string";
+			var parsedSubject = "parsedSubjectString";
+
+			_clientController.Read().Returns(readLine, readLine, readLine, _mailDataSection);
+			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(
+				RequestCommands.Hello,
+				RequestCommands.RcptTo,
+				RequestCommands.Data,
+				RequestCommands.Quit);
+
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _hostName).Returns("response1");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, _hostName).Returns("response2");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.StrtInputEndWith).Returns("response3");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted).Returns("response4");
+			_emailParser.ParseSubjectFromDataSection(Arg.Any<NameValueCollection>()).Returns(parsedSubject);
+
+			//act
+			var message = _clientProcessor.Run();
+
+			//assert
+			message.Subject.Should().Be(parsedSubject);
+		}
+
+		[Test]
+		public void Run_ShoulSetHeadersCollection()
+		{
+			//arrange
+			var readLine = "not empty string";
+			var expectedCollection = new NameValueCollection();
+
+			_clientController.Read().Returns(readLine, readLine, readLine, _mailDataSection);
+			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(
+				RequestCommands.Hello,
+				RequestCommands.RcptTo,
+				RequestCommands.Data,
+				RequestCommands.Quit);
+
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvReady, _hostName).Returns("response1");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.SrvHelloNoTls, _hostName).Returns("response2");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.StrtInputEndWith).Returns("response3");
+			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted).Returns("response4");
+			_emailParser.ParseHeadersFromDataSection(_mailDataSection).Returns(expectedCollection);
+
+			//act
+			var message = _clientProcessor.Run();
+
+			//assert
+			message.Headers.Should().BeSameAs(expectedCollection);
 		}
 	}
 }

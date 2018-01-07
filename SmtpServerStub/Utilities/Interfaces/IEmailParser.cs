@@ -1,15 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Net.Mail;
 
 namespace SmtpServerStub.Utilities.Interfaces
 {
     internal interface IEmailParser
     {
-        MailAddress ParseEmailFromRecipientCommand(string commandStr);
+        MailAddress ParseEmailFromString(string commandStr);
         MailAddress ParseEmailFromEmailString(string commandStr);
         List<MailAddress> ParseEmailsFromString(string commandStr);
-        List<MailAddress> ParseEmailsFromDataCc(string commandStr);
-        List<MailAddress> ParseEmailsFromDataTo(string commandStr);
-	    string ParseBodyFromDataSection(string dataSection);
+        List<MailAddress> ParseEmailsFromDataCc(NameValueCollection headers);
+        List<MailAddress> ParseEmailsFromDataTo(NameValueCollection headers);
+	    string ParseSubjectFromDataSection(NameValueCollection headers);
+		string ParseBodyFromDataSection(string dataSection);
+	    NameValueCollection ParseHeadersFromDataSection(string dataSection);
     }
 }

@@ -52,9 +52,9 @@ namespace SmtpServerStub.SmtpApplication
 				{
 					nextLine = _clientController.Read();
 				}
-				catch
+				catch (Exception e)
 				{
-					Logger.LogWarning("Stream was closed before QUIT command from server");
+					Logger.LogWarning("Stream was closed before QUIT command from server:\n" + e.Message);
 					break;
 				}
 
@@ -136,7 +136,7 @@ namespace SmtpServerStub.SmtpApplication
 
 			try
 			{
-				recipient = EmailParser.ParseEmailFromRecipientCommand(nextLine);
+				recipient = EmailParser.ParseEmailFromString(nextLine);
 			}
 			catch
 			{
@@ -157,7 +157,7 @@ namespace SmtpServerStub.SmtpApplication
 			MailAddress sender;
 			try
 			{
-				sender = EmailParser.ParseEmailFromRecipientCommand(nextLine);
+				sender = EmailParser.ParseEmailFromString(nextLine);
 			}
 			catch
 			{
@@ -186,13 +186,19 @@ namespace SmtpServerStub.SmtpApplication
 			messageData.Append(strMessage);
 
 			var msgDataStr = messageData.ToString();
-			var cc = EmailParser.ParseEmailsFromDataCc(msgDataStr);
-			var parsedToList = EmailParser.ParseEmailsFromDataTo(msgDataStr);
+
+			var headers = EmailParser.ParseHeadersFromDataSection(msgDataStr);
+			var cc = EmailParser.ParseEmailsFromDataCc(headers);
+			var parsedToList = EmailParser.ParseEmailsFromDataTo(headers);
 			var toList = MergeToList(message.To, parsedToList);
 
 			message.To = toList;
 			message.CC = cc;
-			message.MailMessageDataSection = messageData.ToString().Trim();
+			message.Body = EmailParser.ParseBodyFromDataSection(msgDataStr);
+			message.Subject = EmailParser.ParseSubjectFromDataSection(headers);
+			message.Headers = headers;
+
+			message.MailMessageDataSection = msgDataStr.Trim();
 
 			//TODO: set correct message.From name using data section headers
 
