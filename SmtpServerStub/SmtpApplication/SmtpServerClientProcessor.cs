@@ -190,19 +190,18 @@ namespace SmtpServerStub.SmtpApplication
 			var headers = EmailParser.ParseHeadersFromDataSection(msgDataStr);
 			var cc = EmailParser.ParseEmailsFromDataCc(headers);
 			var parsedToList = EmailParser.ParseEmailsFromDataTo(headers);
+			var parsedFromList = EmailParser.ParseEmailsFromDataFrom(headers);
 			var toList = MergeToList(message.To, parsedToList);
 
 			message.To = toList;
 			message.CC = cc;
+			message.From = GetMailAddressByAddress(message.From, parsedFromList);
+
 			message.Body = EmailParser.ParseBodyFromDataSection(msgDataStr);
 			message.Subject = EmailParser.ParseSubjectFromDataSection(headers);
 			message.Headers = headers;
 
 			message.MailMessageDataSection = msgDataStr.Trim();
-
-			//TODO: set correct message.From name using data section headers
-
-			Console.WriteLine("\n\n\n----------------------------\n\n\n" + messageData + "----------------------------\n\n\n");
 
 			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
 			return false;
@@ -219,6 +218,17 @@ namespace SmtpServerStub.SmtpApplication
 			var resultList = summary.Where(a => summary.Count(x => x.Address == a.Address) == 1 || !string.IsNullOrEmpty(a.DisplayName)).ToList();
 
 			return resultList;
+		}
+
+		private MailAddress GetMailAddressByAddress(MailAddress address, IList<MailAddress> listOfMails)
+		{
+			if (address == null || listOfMails == null)
+			{
+				return address;
+			}
+
+			var foundMail = listOfMails.FirstOrDefault(m => m.Address == address.Address && !string.IsNullOrEmpty(m.DisplayName));
+			return foundMail ?? address;
 		}
 	}
 }

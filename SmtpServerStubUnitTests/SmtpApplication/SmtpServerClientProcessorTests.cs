@@ -73,13 +73,42 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 		}
 
 		[Test]
+		public void Run_ShouldCorrectlyParseMailFromAndAddDisplayNameFromHeaders()
+		{
+			//arrange
+			var expectedAddress = new MailAddress("valentin.kostiuk@gmail.com");
+			var commandStub = "not empty string";
+			var headers = new NameValueCollection();
+			var fromAddressesCollection = new List<MailAddress>
+			{
+				new MailAddress("ololo@trololo.com"),
+				new MailAddress("valentin.kostiuk@gmail.com"),
+				new MailAddress("valentin.kostiuk@gmail.com", "Valentin Display Name")
+			};
+
+			_clientController.Read().Returns(commandStub, commandStub, commandStub, _mailDataSection, commandStub);
+			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>())
+				.Returns(RequestCommands.Hello, RequestCommands.MailFrom, RequestCommands.Data, RequestCommands.Quit);
+			_emailParser.ParseEmailFromString(commandStub).Returns(expectedAddress);
+			_emailParser.ParseHeadersFromDataSection(_mailDataSection).Returns(headers);
+			_emailParser.ParseEmailsFromDataFrom(headers).Returns(fromAddressesCollection);
+
+			//act
+			var message = _clientProcessor.Run();
+
+			//assert
+			message.From.Address.Should().Be("valentin.kostiuk@gmail.com");
+			message.From.DisplayName.Should().Be("Valentin Display Name");
+		}
+
+		[Test]
 		public void Run_ShouldLogExceptionIfReadIsUnsuccessfull()
 		{
 			//arrange
 			_clientController.Read().Returns("not empty string");
 			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.MailFrom, RequestCommands.Quit);
 			_clientController.When(cc => cc.Read()).Throw(new Exception("some read exception"));
-			
+
 			//act
 			_clientProcessor.Run();
 
@@ -91,12 +120,11 @@ namespace SmtpServerStubUnitTests.SmtpApplication
 		public void Run_ShouldRespondWithErrorIfFromIsIncorrect()
 		{
 			//arrange
-			var expectedAddress = new MailAddress("some@address.com", "display name");
-
 			_clientController.Read().Returns("not empty string");
 			_requestCommandsConverter.ToRequestCommandCode(Arg.Any<string>()).Returns(RequestCommands.Hello, RequestCommands.MailFrom, RequestCommands.Quit);
 			_emailParser.ParseEmailFromString("not empty string").ThrowsForAnyArgs(new Exception("very incorrect e-mail"));
 			_serverStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.MbNameNotAllowed).Returns("response with error");
+
 			//act
 			var message = _clientProcessor.Run();
 
