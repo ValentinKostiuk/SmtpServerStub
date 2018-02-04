@@ -35,14 +35,22 @@ namespace SmtpServerStub.SmtpApplication
 
 		public MailMessage Run()
 		{
-			SendServerReady();
-			return ReceiveMessage();
+			try
+			{
+				return ReceiveMessage();
+			}
+			finally
+			{
+				_clientController.Close();
+			}
 		}
 
 		private MailMessage ReceiveMessage()
 		{
 			var message = new MailMessage();
 			var processingFinished = false;
+
+			SendServerReady();
 
 			while (!processingFinished)
 			{
@@ -90,7 +98,6 @@ namespace SmtpServerStub.SmtpApplication
 				}
 			}
 
-			_clientController.Close();
 			return message;
 		}
 

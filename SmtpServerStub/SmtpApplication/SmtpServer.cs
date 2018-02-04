@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -18,7 +20,7 @@ namespace SmtpServerStub.SmtpApplication
     {
         private readonly TcpListener _tcpListener;
         private readonly ISmtpServerClientHandlerFactory _clientHandlerFactory;
-        private readonly List<IMailMessage> _receivedMessages;
+        private readonly ConcurrentBag<IMailMessage> _receivedMessages;
         private readonly ILogger _logger;
 
         /// <inheritdoc />
@@ -29,7 +31,7 @@ namespace SmtpServerStub.SmtpApplication
         {
             var endPoint = new IPEndPoint(settings.IpAddress, settings.Port);
             _tcpListener = new TcpListener(endPoint);
-            _receivedMessages = new List<IMailMessage>();
+            _receivedMessages = new ConcurrentBag<IMailMessage>();
             _logger = logger != null && settings.EnableLogging ? logger : new NoopLogger();
 
             _clientHandlerFactory = new TcpClientHandlerFactory(settings.Certificate, _logger);
@@ -38,7 +40,7 @@ namespace SmtpServerStub.SmtpApplication
         /// <inheritdoc />
         public void Start()
         {
-            _tcpListener.Start();
+			_tcpListener.Start();
             while (true)
             {
                 var client = _tcpListener.AcceptTcpClient();
@@ -67,7 +69,7 @@ namespace SmtpServerStub.SmtpApplication
         /// <inheritdoc />
         public List<IMailMessage> GetReceivedMails()
         {
-            return _receivedMessages;
+            return _receivedMessages.ToList();
         }
     }
 }

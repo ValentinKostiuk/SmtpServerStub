@@ -52,7 +52,7 @@ namespace SmtpServerStub.SmtpApplication
 
 		public void Write(string message)
 		{
-            var stream = _switchedToSsl ? _sslStream : (Stream) _networkStream;
+			var stream = _switchedToSsl ? _sslStream : (Stream) _networkStream;
 			var encoder = new UTF8Encoding();
 			var buffer = encoder.GetBytes(message + "\r\n");
 
@@ -81,10 +81,16 @@ namespace SmtpServerStub.SmtpApplication
 
 		public void Close()
 		{
-			_networkStream.Flush();
-			_sslStream.Flush();
-			_client.Close();
-			_client.Dispose();
+			try
+			{
+				_networkStream.Flush();
+				_sslStream.Flush();
+				_client.Close();
+			}
+			finally
+			{
+				_client.Dispose();
+			}
 		}
 
 		public string HostName
