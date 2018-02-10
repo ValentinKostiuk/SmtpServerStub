@@ -185,7 +185,7 @@ namespace SmtpServerStub.SmtpApplication
 			var strMessage = _clientController.Read();
 			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
 
-			while (!strMessage.EndsWith("\r\n.\r\n"))
+			while (!strMessage.Contains("\r\n.\r\n"))//Contains because some times QUIT is added right to the body
 			{
 				messageData.Append(strMessage);
 				strMessage = _clientController.Read();
