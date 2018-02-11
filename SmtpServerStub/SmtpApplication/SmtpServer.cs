@@ -17,17 +17,18 @@ namespace SmtpServerStub.SmtpApplication
 	public delegate void EmailReceivedEventHandler(ISmtpServer sender, EmailReceivedEventArgs e);
 
 	/// <summary>
-	/// Main class which allows stub SMTP server to check sent emails
+	///     Main class which allows stub SMTP server to check sent emails
 	/// </summary>
 	public class SmtpServer : ISmtpServer
 	{
 		private readonly TcpListener _tcpListener;
 		private readonly ISmtpServerClientHandlerFactory _clientHandlerFactory;
-		private readonly ConcurrentBag<IMailMessage> _receivedMessages;
 		private readonly ILogger _logger;
+		private readonly IList<Task> _receiveEmailTasks;
+
+		private ConcurrentBag<IMailMessage> _receivedMessages;
 		private bool _stopped;
 		private Thread _serverThread;
-		private readonly IList<Task> _receiveEmailTasks;
 
 		/// <inheritdoc />
 		public event EmailReceivedEventHandler OnEmailReceived;
@@ -43,32 +44,12 @@ namespace SmtpServerStub.SmtpApplication
 			_receiveEmailTasks = new List<Task>();
 		}
 
-
 		/// <inheritdoc />
 		public Thread Start()
 		{
 			_serverThread = new Thread(StartServer);
 			_serverThread.Start();
 			return _serverThread;
-		}
-
-		private void StartServer()
-		{
-			_tcpListener.Start();
-
-			while (!_stopped)
-			{
-				try
-				{
-					var client = _tcpListener.AcceptTcpClient();
-					var task = CreateReceiveMailTask(client);
-					_receiveEmailTasks.Add(task);
-				}
-				catch (SocketException e) when (e.SocketErrorCode == SocketError.Interrupted && _stopped)
-				{
-					_logger.LogInfo("Server socked stopped by request");
-				}
-			}
 		}
 
 		/// <inheritdoc />
@@ -91,6 +72,44 @@ namespace SmtpServerStub.SmtpApplication
 		{
 			Task.WaitAll(_receiveEmailTasks.ToArray());
 			return _receivedMessages.ToList();
+		}
+
+		/// <inheritdoc />
+		public void ResetState()
+		{
+			lock (_receiveEmailTasks)
+			{
+				Task.WaitAll(_receiveEmailTasks.ToArray());
+				foreach (var receiveEmailTask in _receiveEmailTasks)
+				{
+					receiveEmailTask.Dispose();
+				}
+				_receiveEmailTasks.Clear();
+				_receivedMessages = new ConcurrentBag<IMailMessage>();
+				OnEmailReceived = null;
+			}
+		}
+
+		private void StartServer()
+		{
+			_tcpListener.Start();
+
+			while (!_stopped)
+			{
+				try
+				{
+					var client = _tcpListener.AcceptTcpClient();
+					var task = CreateReceiveMailTask(client);
+					lock (_receiveEmailTasks)
+					{
+						_receiveEmailTasks.Add(task);
+					}
+				}
+				catch (SocketException e) when (e.SocketErrorCode == SocketError.Interrupted && _stopped)
+				{
+					_logger.LogInfo("Server socket stopped by request");
+				}
+			}
 		}
 
 		private Task CreateReceiveMailTask(TcpClient client)

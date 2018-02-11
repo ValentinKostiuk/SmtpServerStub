@@ -38,5 +38,12 @@ namespace SmtpServerStub.SmtpApplication.Interfaces
 		/// </summary>
 		/// <returns><c>List</c>of<c>MailMessage</c></returns>
 		List<IMailMessage> GetReceivedMails();
+
+	    /// <summary>
+	    /// Blocks calling thread until all started perceptions finish.
+	    /// Clears all assigned event listeners.
+	    /// Clears received mails collection.
+	    /// </summary>
+		void ResetState();
     }
 }
