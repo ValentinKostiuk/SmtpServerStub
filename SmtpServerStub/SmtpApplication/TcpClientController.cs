@@ -59,7 +59,6 @@ namespace SmtpServerStub.SmtpApplication
 
 			stream.Write(buffer, 0, buffer.Length);
 			stream.Flush();
-			Console.WriteLine("Write " + message);
 		}
 
 		public string Read()
@@ -78,8 +77,6 @@ namespace SmtpServerStub.SmtpApplication
 			} while (_networkStream.DataAvailable);
 
 			var result = messageData.ToString();
-
-			Console.WriteLine("Read: " + result);
 			return result;
 		}
 
@@ -107,15 +104,5 @@ namespace SmtpServerStub.SmtpApplication
 				return hostEntry.HostName;
 			}
 		}
-
-		private bool IsClientConnectedAndWritable =>
-			_client.Connected
-			&& _client.Client.Poll(-1, SelectMode.SelectWrite)
-			&& !_client.Client.Poll(-1, SelectMode.SelectError);
-
-		private bool IsClientConnectedAndReadable =>
-			_client.Connected
-			&& _client.Client.Poll(-1, SelectMode.SelectRead)
-			&& !_client.Client.Poll(-1, SelectMode.SelectError);
 	}
 }

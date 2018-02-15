@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.Runtime.CompilerServices;
@@ -185,7 +186,7 @@ namespace SmtpServerStub.SmtpApplication
 			var strMessage = _clientController.Read();
 			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
 
-			while (!strMessage.Contains("\r\n.\r\n"))//Contains because some times QUIT is added right to the body
+			while (!strMessage.Contains("\r\n.\r\n")) //Contains because some times QUIT is added right to the body
 			{
 				messageData.Append(strMessage);
 				strMessage = _clientController.Read();
@@ -211,7 +212,7 @@ namespace SmtpServerStub.SmtpApplication
 			message.MailMessageDataSection = msgDataStr.Trim();
 
 			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
-			return false;
+			return ClientHasEndedSendingMail(msgDataStr);
 		}
 
 		private List<MailAddress> MergeToList(IList<MailAddress> list1, IList<MailAddress> list2)
@@ -236,6 +237,11 @@ namespace SmtpServerStub.SmtpApplication
 
 			var foundMail = listOfMails.FirstOrDefault(m => m.Address == address.Address && !string.IsNullOrEmpty(m.DisplayName));
 			return foundMail ?? address;
+		}
+
+		private bool ClientHasEndedSendingMail(string dataSection)
+		{
+			return dataSection.EndsWith("\r\n.\r\nQUIT\r\n", true, CultureInfo.InvariantCulture);
 		}
 	}
 }
