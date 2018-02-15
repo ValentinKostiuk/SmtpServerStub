@@ -132,7 +132,7 @@ namespace SmtpServerStub.SmtpApplication
 
 		private bool HandleHello(MailMessage message, string nextLine)
 		{
-			var responseStatus = _clientController.IsTlsAvailable ? ResponseCodes.SrvHello : ResponseCodes.RqstActOkCompleted;
+			var responseStatus = _clientController.IsTlsAvailable ? ResponseCodes.SrvHello : ResponseCodes.SrvHelloNoTls;
 			var response = ServerStatusCodesConverter.GetTextResponseForStatus(responseStatus, _clientController.HostName);
 			_clientController.Write(response);
 			return false;
