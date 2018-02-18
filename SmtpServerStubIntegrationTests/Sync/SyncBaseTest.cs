@@ -10,7 +10,7 @@ using SmtpServerStub.SmtpApplication;
 using SmtpServerStub.SmtpApplication.Interfaces;
 using MailMessage = System.Net.Mail.MailMessage;
 
-namespace SmtpServerStubIntegrationTests
+namespace SmtpServerStubIntegrationTests.Sync
 {
 	public class SyncBaseTest
 	{

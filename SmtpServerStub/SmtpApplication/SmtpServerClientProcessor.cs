@@ -196,13 +196,13 @@ namespace SmtpServerStub.SmtpApplication
 			var msgDataStr = messageData.ToString();
 
 			var headers = EmailParser.ParseHeadersFromDataSection(msgDataStr);
-			var cc = EmailParser.ParseEmailsFromDataCc(headers);
+			var parsedCcList = EmailParser.ParseEmailsFromDataCc(headers);
 			var parsedToList = EmailParser.ParseEmailsFromDataTo(headers);
 			var parsedFromList = EmailParser.ParseEmailsFromDataFrom(headers);
-			var toList = MergeToList(message.To, parsedToList);
+			var toList = MergeToList(message.To, parsedToList, parsedCcList);
 
 			message.To = toList;
-			message.CC = cc;
+			message.CC = parsedCcList;
 			message.From = GetMailAddressByAddress(message.From, parsedFromList);
 
 			message.Body = EmailParser.ParseBodyFromDataSection(msgDataStr);
@@ -215,14 +215,19 @@ namespace SmtpServerStub.SmtpApplication
 			return ClientHasEndedSendingMail(msgDataStr);
 		}
 
-		private List<MailAddress> MergeToList(IList<MailAddress> list1, IList<MailAddress> list2)
+		private List<MailAddress> MergeToList(IList<MailAddress> toListFromCommands, IList<MailAddress> parsedToList, IList<MailAddress> parsedCcList)
 		{
-			if (list2 == null || list2.Count == 0)
+			if (parsedToList == null || parsedToList.Count == 0)
 			{
-				return list1.ToList();
+				return toListFromCommands.ToList();
 			}
 
-			var summary = list1.Concat(list2);
+			if (parsedCcList != null)
+			{
+				toListFromCommands = toListFromCommands.Where(m => !parsedCcList.Any(cc => cc.Address == m.Address && cc.DisplayName == m.DisplayName)).ToList();
+			}
+
+			var summary = toListFromCommands.Concat(parsedToList);
 			var resultList = summary.Where(a => summary.Count(x => x.Address == a.Address) == 1 || !string.IsNullOrEmpty(a.DisplayName)).ToList();
 
 			return resultList;

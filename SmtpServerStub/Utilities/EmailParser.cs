@@ -46,6 +46,11 @@ namespace SmtpServerStub.Utilities
 
 		public virtual List<MailAddress> ParseEmailsFromString(string commandStr)
 		{
+			if (commandStr == null)
+			{
+				return new List<MailAddress>();
+			}
+
 			var formattedString = commandStr.Trim().Replace("\n", string.Empty).Replace("\r", string.Empty);
 			var splittedMailPairs = formattedString.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
 			return splittedMailPairs.Select(ParseEmailFromEmailString).Distinct().ToList();
