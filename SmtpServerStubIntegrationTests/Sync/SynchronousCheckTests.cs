@@ -7,9 +7,9 @@ namespace SmtpServerStubIntegrationTests.Sync
 	[TestFixture]
 	public class SynchronousCheckTests: SyncBaseTest
 	{
-		readonly MailAddress _fromAddress = new MailAddress("valentin.kostiukFrom@gmail.com", "From Name");
-		readonly MailAddress _toAddress = new MailAddress("valentin.kostiuk@gmail.com", "To Name");
-		readonly MailAddress _toAddress2 = new MailAddress("valentin.kostiuk2@gmail.com");
+		private readonly MailAddress _fromAddress = new MailAddress("valentin.kostiukFrom@gmail.com", "From Name");
+		private readonly MailAddress _toAddress = new MailAddress("valentin.kostiuk@gmail.com", "To Name");
+		private readonly MailAddress _toAddress2 = new MailAddress("valentin.kostiuk2@gmail.com");
 
 		[TestCase(true)]
 		[TestCase(false)]
@@ -23,14 +23,11 @@ namespace SmtpServerStubIntegrationTests.Sync
 
 			message.To.Add(_toAddress);
 			message.CC.Add(_toAddress2);
-			
-			SendMessage(message, enableSsl);
-			SendMessage(message, enableSsl);
-			SendMessage(message, enableSsl);
-			SendMessage(message, enableSsl);
-			SendMessage(message, enableSsl);
-			SendMessage(message, enableSsl);
-			SendMessage(message, enableSsl);
+
+			for (int i = 0; i < 7; i++)
+			{
+				SendMessage(message, enableSsl);
+			}
 
 			Server.GetReceivedMails().Count.Should().Be(7);
 		}
