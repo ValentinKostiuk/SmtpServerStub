@@ -15,5 +15,6 @@ namespace SmtpServerStub.Utilities.Interfaces
 		string ParseSubjectFromDataSection(NameValueCollection headers);
 		string ParseBodyFromDataSection(string dataSection);
 		NameValueCollection ParseHeadersFromDataSection(string dataSection);
+		bool GetIsMailBodyHtml(NameValueCollection headers);
 	}
 }

@@ -292,5 +292,48 @@ namespace SmtpServerStubUnitTests.Utilities
 			result.Should().BeOfType<MailAddress>();
 			result.Address.Should().Be("valentin.kostiuk@gmail.com");
 		}
+
+		[Test]
+		public void GetIsMailBodyHtml_ReturnsTrue()
+		{
+			//arrange
+			var headers = new NameValueCollection();
+
+			headers.Add("Content-Type", "text/html; charset=utf-8");
+
+			//act
+			var result = _emailParser.GetIsMailBodyHtml(headers);
+
+			//assert
+			result.Should().Be(true);
+		}
+
+		[Test]
+		public void GetIsMailBodyHtml_ReturnsFalse()
+		{
+			//arrange
+			var headers = new NameValueCollection();
+
+			headers.Add("Content-Type", "text/plain; charset=utf-8");
+
+			//act
+			var result = _emailParser.GetIsMailBodyHtml(headers);
+
+			//assert
+			result.Should().Be(false);
+		}
+
+		[Test]
+		public void GetIsMailBodyHtml_ReturnsFalseIfNoHeadersFound()
+		{
+			//arrange
+			var headers = new NameValueCollection();
+
+			//act
+			var result = _emailParser.GetIsMailBodyHtml(headers);
+
+			//assert
+			result.Should().Be(false);
+		}
 	}
 }

@@ -89,6 +89,16 @@ namespace SmtpServerStub.Utilities
 			return headers.Get("Subject");
 		}
 
+		public virtual bool GetIsMailBodyHtml(NameValueCollection headers)
+		{
+			var contentType = headers.Get("Content-Type");
+			if (contentType == null)
+			{
+				return false;
+			}
+			return contentType.ToLowerInvariant().Contains("text/html");
+		}
+
 		public NameValueCollection ParseHeadersFromDataSection(string dataSection)
 		{
 			var result = new NameValueCollection();

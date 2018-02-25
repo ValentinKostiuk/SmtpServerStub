@@ -203,11 +203,12 @@ namespace SmtpServerStub.SmtpApplication
 
 			message.To = toList;
 			message.CC = parsedCcList;
-			message.From = GetMailAddressByAddress(message.From, parsedFromList);
+			message.From = GetMailAddressesByAddress(message.From, parsedFromList);
 
 			message.Body = EmailParser.ParseBodyFromDataSection(msgDataStr);
 			message.Subject = EmailParser.ParseSubjectFromDataSection(headers);
 			message.Headers = headers;
+			message.IsBodyHtml = EmailParser.GetIsMailBodyHtml(headers);
 
 			message.MailMessageDataSection = msgDataStr.Trim();
 
@@ -233,7 +234,7 @@ namespace SmtpServerStub.SmtpApplication
 			return resultList;
 		}
 
-		private MailAddress GetMailAddressByAddress(MailAddress address, IList<MailAddress> listOfMails)
+		private MailAddress GetMailAddressesByAddress(MailAddress address, IList<MailAddress> listOfMails)
 		{
 			if (address == null || listOfMails == null)
 			{

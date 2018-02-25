@@ -53,14 +53,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 				EnableSsl = enableSsl
 			})
 			{
-				try
-				{
-					smtp.Send(mailMessage);
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e);
-				}
+				smtp.Send(mailMessage);
 			}
 		}
 	}
