@@ -48,18 +48,19 @@ namespace SmtpServerStubIntegrationTests.Async
 
 		public void SendMessageAsync(MailMessage mailMessage, bool enableSsl = false)
 		{
-			using (var smtp = new SmtpClient
+			var smtp = new SmtpClient
 			{
 				Host = "localhost",
 				Port = 25,
 				EnableSsl = enableSsl
-			})
-			{
-				smtp.SendMailAsync(mailMessage);
-			}
+			};
+
+			smtp.SendCompleted += (sender, args) => { smtp.Dispose(); };
+			smtp.SendMailAsync(mailMessage);
+			//smtp.SendAsync(mailMessage, null);
 		}
 
-		public IList<IMailMessage> WaitMailMessagesReceived(Action startSending, int expectedMailsNumber, int timeout)
+		public IList<IMailMessage> WaitMessagesReceived(Action startSending, int expectedMailsNumber, int timeout)
 		{
 			var receivedCount = 0;
 			var receivedMessages = new List<IMailMessage>();
@@ -77,6 +78,24 @@ namespace SmtpServerStubIntegrationTests.Async
 			WaitHandle.WaitAll(manualEvents, timeout);
 
 			return receivedMessages;
+		}
+
+		public IMailMessage WaitOneMessageReceived(Action startSending, int timeout)
+		{
+			var receivedMessageEvent = new ManualResetEvent(false);
+			IMailMessage receivedMessage = null;
+
+			Server.OnEmailReceived += (sender, args) =>
+			{
+				receivedMessage = args.MailMessage;
+				receivedMessageEvent.Set();
+			};
+
+			startSending();
+
+			receivedMessageEvent.WaitOne(timeout);
+
+			return receivedMessage;
 		}
 	}
 }

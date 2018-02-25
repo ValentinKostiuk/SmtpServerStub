@@ -34,12 +34,12 @@ namespace SmtpServerStubIntegrationTests.Sync
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void ContainsCorrectEmailBody(bool enableSsl)
+		public void ContainsCorrectEmailBodyNonASCII(bool enableSsl)
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
 				Subject = "Subject of email",
-				Body = "Body of the best email ever."
+				Body = "Body of the best email ever. Некоторые, не ASCII символы. Ну, просто что бы что-то проверить. Ё!!!"
 			};
 
 			message.To.Add(_toAddress);
