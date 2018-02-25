@@ -29,7 +29,7 @@ namespace SmtpServerStub.Utilities
 				}
 				default:
 				{
-						throw new ArgumentException("Unrecognizable transfer encoding");
+						throw new ArgumentException("Unrecognizable transfer encoding.");
 				}
 			}
 		}
