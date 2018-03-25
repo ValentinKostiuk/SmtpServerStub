@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -7,6 +6,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using SmtpServerStub.Dtos;
+using SmtpServerStub.Exceptions;
 using SmtpServerStub.SmtpApplication.Interfaces;
 
 namespace SmtpServerStub.SmtpApplication
@@ -36,14 +36,8 @@ namespace SmtpServerStub.SmtpApplication
 				_sslStream.AuthenticateAsServer(_certificate, false, SslProtocols.Tls, true);
 				_switchedToSsl = true;
 			}
-			catch (AuthenticationException e)
+			catch (AuthenticationException)
 			{
-				Logger.LogError(string.Format("Exception: {0}\n", e.Message));
-				if (e.InnerException != null)
-				{
-					Logger.LogError(string.Format("Inner exception: {0}\n", e.InnerException.Message));
-				}
-				Logger.LogError("Authentication failed - closing the connection.");
 				Close();
 				throw;
 			}
@@ -63,6 +57,10 @@ namespace SmtpServerStub.SmtpApplication
 
 		public string Read()
 		{
+			if (HasClientDisconnected())
+			{
+				throw new ClientControllerException("Client has disconnected unexpectedly.");
+			}
 			var stream = _switchedToSsl ? _sslStream : (Stream) _networkStream;
 			var buffer = new byte[2048];
 			var messageData = new StringBuilder();
@@ -103,6 +101,19 @@ namespace SmtpServerStub.SmtpApplication
 				var hostEntry = Dns.GetHostEntry(ipAddress);
 				return hostEntry.HostName;
 			}
+		}
+
+		private bool HasClientDisconnected()
+		{
+			if (_client.Client.Poll(0, SelectMode.SelectRead))
+			{
+				var buff = new byte[1];
+				if (_client.Client.Receive(buff, SocketFlags.Peek) == 0)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

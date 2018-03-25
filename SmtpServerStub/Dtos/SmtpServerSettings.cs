@@ -13,7 +13,6 @@ namespace SmtpServerStub.Dtos
         {
             IpAddress = IPAddress.Any;
             Port = 25;
-            EnableLogging = false;
         }
 
 	    /// <inheritdoc />
@@ -24,8 +23,5 @@ namespace SmtpServerStub.Dtos
 
 	    /// <inheritdoc />
 	    public X509Certificate2 Certificate { get; set; }
-
-	    /// <inheritdoc />
-	    public bool EnableLogging { get; set; }
     }
 }

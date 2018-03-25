@@ -68,6 +68,8 @@
   <ItemGroup>
     <Compile Include="Async\AsyncBaseTest.cs" />
     <Compile Include="Async\AsynchronousCheckTests.cs" />
+    <Compile Include="NoSsl\NoSslBaseTest.cs" />
+    <Compile Include="NoSsl\SynchronousNoSslCheckTests.cs" />
     <Compile Include="Sync\SyncBaseTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sync\SynchronousCheckTests.cs" />

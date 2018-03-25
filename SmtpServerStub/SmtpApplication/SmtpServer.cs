@@ -39,7 +39,7 @@ namespace SmtpServerStub.SmtpApplication
 			var endPoint = new IPEndPoint(settings.IpAddress, settings.Port);
 			_tcpListener = new TcpListener(endPoint);
 			_receivedMessages = new ConcurrentBag<IMailMessage>();
-			_logger = logger != null && settings.EnableLogging ? logger : new NoopLogger();
+			_logger = logger ?? new NoopLogger();
 			_clientHandlerFactory = new TcpClientHandlerFactory(settings.Certificate, _logger);
 			_receiveEmailTasks = new List<Task>();
 		}

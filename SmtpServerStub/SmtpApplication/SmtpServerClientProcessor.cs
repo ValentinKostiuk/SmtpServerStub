@@ -119,6 +119,10 @@ namespace SmtpServerStub.SmtpApplication
 			catch (Exception e)
 			{
 				Logger.LogError(string.Format("Exception occurred while switching to TLS:\n{0}", e.Message));
+				if (e.InnerException != null)
+				{
+					Logger.LogError(string.Format("Inner exception: {0}\n", e.InnerException.Message));
+				}
 				_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.AccessDenied));
 				return true;
 			}

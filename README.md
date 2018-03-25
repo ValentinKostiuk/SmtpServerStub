@@ -11,8 +11,6 @@ Install-Package SmtpServerStub -Version 1.0.0
 ```
 Or using NuGet Package Manager.
 
-### Installing
-
 ## Running the tests
 
 ### Break down into end to end tests

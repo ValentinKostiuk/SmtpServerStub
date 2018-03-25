@@ -1,19 +1,19 @@
-﻿using System.Net.Mail;
+﻿using System;
+using System.Net.Mail;
 using FluentAssertions;
+using NSubstitute;
 using NUnit.Framework;
 
-namespace SmtpServerStubIntegrationTests.Sync
+namespace SmtpServerStubIntegrationTests.NoSsl
 {
 	[TestFixture]
-	public class SynchronousCheckTests : SyncBaseTest
+	public class SynchronousNoSslCheckTests : NoSslBaseTest
 	{
 		private readonly MailAddress _fromAddress = new MailAddress("valentin.kostiukFrom@gmail.com", "From Name");
 		private readonly MailAddress _toAddress = new MailAddress("valentin.kostiuk@gmail.com", "To Name");
 		private readonly MailAddress _toAddress2 = new MailAddress("valentin.kostiuk2@gmail.com");
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void ContainsCorrectEmailsCount(bool enableSsl)
+		public void ContainsCorrectEmailsCount()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -26,15 +26,13 @@ namespace SmtpServerStubIntegrationTests.Sync
 
 			for (var i = 0; i < 7; i++)
 			{
-				SendMessage(message, enableSsl);
+				SendMessage(message);
 			}
 
 			Server.GetReceivedMails().Count.Should().Be(7);
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void ContainsCorrectEmailBodyNonAscii(bool enableSsl)
+		public void ContainsCorrectEmailBodyNonAscii()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -45,16 +43,14 @@ namespace SmtpServerStubIntegrationTests.Sync
 			message.To.Add(_toAddress);
 			message.CC.Add(_toAddress2);
 
-			SendMessage(message, enableSsl);
+			SendMessage(message);
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
 			receivedMail.Body.Should().Be(message.Body);
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void ContainsCorrectEmailBodyWithNewLines(bool enableSsl)
+		public void ContainsCorrectEmailBodyWithNewLines()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -65,16 +61,14 @@ namespace SmtpServerStubIntegrationTests.Sync
 			message.To.Add(_toAddress);
 			message.CC.Add(_toAddress2);
 
-			SendMessage(message, enableSsl);
+			SendMessage(message);
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
 			receivedMail.Body.Should().Be(message.Body);
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void ContainsCorrectEmailFrom(bool enableSsl)
+		public void ContainsCorrectEmailFrom()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -85,7 +79,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 			message.To.Add(_toAddress);
 			message.CC.Add(_toAddress2);
 
-			SendMessage(message, enableSsl);
+			SendMessage(message);
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
@@ -93,9 +87,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 			receivedMail.From.DisplayName.Should().Be(_fromAddress.DisplayName);
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void ContainsCorrectEmailSubject(bool enableSsl)
+		public void ContainsCorrectEmailSubject()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -106,16 +98,14 @@ namespace SmtpServerStubIntegrationTests.Sync
 			message.To.Add(_toAddress);
 			message.CC.Add(_toAddress2);
 
-			SendMessage(message, enableSsl);
+			SendMessage(message);
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
 			receivedMail.Subject.Should().Be(message.Subject);
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void ContainsCorrectEmailСс(bool enableSsl)
+		public void ContainsCorrectEmailСс()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -127,7 +117,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 			message.CC.Add(_toAddress2);
 			message.CC.Add(_toAddress);
 
-			SendMessage(message, enableSsl);
+			SendMessage(message);
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
@@ -138,9 +128,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 			receivedMail.CC[1].DisplayName.Should().Be(_toAddress.DisplayName);
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void ContainsCorrectEmailTo(bool enableSsl)
+		public void ContainsCorrectEmailTo()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -148,7 +136,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 				Body = "Body of the best email ever."
 			};
 
-			SendMessage(message, enableSsl);
+			SendMessage(message);
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
@@ -157,9 +145,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void ContainsCorrectEmailToAndCcAreExcludedFromToList(bool enableSsl)
+		public void ContainsCorrectEmailToAndCcAreExcludedFromToList()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -169,7 +155,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 
 			message.CC.Add(_toAddress2);
 
-			SendMessage(message, enableSsl);
+			SendMessage(message);
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
@@ -178,9 +164,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void ContainsCorrectEmailToList(bool enableSsl)
+		public void ContainsCorrectEmailToList()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -191,7 +175,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 			message.To.Add(_toAddress);
 			message.To.Add(_toAddress2);
 
-			SendMessage(message, enableSsl);
+			SendMessage(message);
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
@@ -200,9 +184,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		public void SetsIsBodyHtml(bool enableSsl)
+		public void SetsIsBodyHtml()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
 			{
@@ -223,12 +205,30 @@ namespace SmtpServerStubIntegrationTests.Sync
 			message.To.Add(_toAddress);
 			message.CC.Add(_toAddress2);
 
-			SendMessage(message, enableSsl);
+			SendMessage(message);
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
 			receivedMail.Body.Should().Be(message.Body);
 			receivedMail.IsBodyHtml.Should().BeTrue();
+		}
+
+		[Test]
+		public void ShouldLogExceptionIfSslRequiredButCertificateHasNotBeenSet()
+		{
+			var message = new MailMessage(_fromAddress, _toAddress)
+			{
+				Subject = "Subject of email",
+				Body = "Body of the best email ever."
+			};
+
+			message.To.Add(_toAddress);
+			message.CC.Add(_toAddress2);
+
+			Action send = () => SendMessage(message, true);
+
+			send.ShouldThrow<SmtpException>().WithMessage("Server does not support secure connections.");
+			LoggerSubstitute.Received(1).LogWarning("Stream was closed before QUIT command from server:\nClient has disconnected unexpectedly.");
 		}
 	}
 }
