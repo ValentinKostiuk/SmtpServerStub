@@ -6,8 +6,8 @@
     <title>$title$</title>
     <authors>valentin.kostiuk@gmail.com</authors>
     <owners>valentin.kostiuk@gmail.com</owners>
-    <licenseUrl>https://github.com/ValentinKostyuk/SmtpServerStub/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/ValentinKostyuk/SmtpServerStub</projectUrl>
+    <licenseUrl>https://github.com/ValentinKostiuk/SmtpServerStub/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/ValentinKostiuk/SmtpServerStub</projectUrl>
     <!--iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Allows to run simple SMTP server stub on selected port</description>
