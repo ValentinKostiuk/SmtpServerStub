@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.Runtime.CompilerServices;
@@ -35,14 +36,22 @@ namespace SmtpServerStub.SmtpApplication
 
 		public MailMessage Run()
 		{
-			SendServerReady();
-			return ReceiveMessage();
+			try
+			{
+				return ReceiveMessage();
+			}
+			finally
+			{
+				_clientController.Close();
+			}
 		}
 
 		private MailMessage ReceiveMessage()
 		{
 			var message = new MailMessage();
 			var processingFinished = false;
+
+			SendServerReady();
 
 			while (!processingFinished)
 			{
@@ -90,7 +99,6 @@ namespace SmtpServerStub.SmtpApplication
 				}
 			}
 
-			_clientController.Close();
 			return message;
 		}
 
@@ -111,6 +119,10 @@ namespace SmtpServerStub.SmtpApplication
 			catch (Exception e)
 			{
 				Logger.LogError(string.Format("Exception occurred while switching to TLS:\n{0}", e.Message));
+				if (e.InnerException != null)
+				{
+					Logger.LogError(string.Format("Inner exception: {0}\n", e.InnerException.Message));
+				}
 				_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.AccessDenied));
 				return true;
 			}
@@ -178,7 +190,7 @@ namespace SmtpServerStub.SmtpApplication
 			var strMessage = _clientController.Read();
 			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
 
-			while (!strMessage.EndsWith("\r\n.\r\n"))
+			while (!strMessage.Contains("\r\n.\r\n")) //Contains because some times QUIT is added right to the body
 			{
 				messageData.Append(strMessage);
 				strMessage = _clientController.Read();
@@ -188,39 +200,45 @@ namespace SmtpServerStub.SmtpApplication
 			var msgDataStr = messageData.ToString();
 
 			var headers = EmailParser.ParseHeadersFromDataSection(msgDataStr);
-			var cc = EmailParser.ParseEmailsFromDataCc(headers);
+			var parsedCcList = EmailParser.ParseEmailsFromDataCc(headers);
 			var parsedToList = EmailParser.ParseEmailsFromDataTo(headers);
 			var parsedFromList = EmailParser.ParseEmailsFromDataFrom(headers);
-			var toList = MergeToList(message.To, parsedToList);
+			var toList = MergeToList(message.To, parsedToList, parsedCcList);
 
 			message.To = toList;
-			message.CC = cc;
-			message.From = GetMailAddressByAddress(message.From, parsedFromList);
+			message.CC = parsedCcList;
+			message.From = GetMailAddressesByAddress(message.From, parsedFromList);
 
 			message.Body = EmailParser.ParseBodyFromDataSection(msgDataStr);
 			message.Subject = EmailParser.ParseSubjectFromDataSection(headers);
 			message.Headers = headers;
+			message.IsBodyHtml = EmailParser.GetIsMailBodyHtml(headers);
 
 			message.MailMessageDataSection = msgDataStr.Trim();
 
 			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
-			return false;
+			return ClientHasEndedSendingMail(msgDataStr);
 		}
 
-		private List<MailAddress> MergeToList(IList<MailAddress> list1, IList<MailAddress> list2)
+		private List<MailAddress> MergeToList(IList<MailAddress> toListFromCommands, IList<MailAddress> parsedToList, IList<MailAddress> parsedCcList)
 		{
-			if (list2 == null || list2.Count == 0)
+			if (parsedToList == null || parsedToList.Count == 0)
 			{
-				return list1.ToList();
+				return toListFromCommands.ToList();
 			}
 
-			var summary = list1.Concat(list2);
+			if (parsedCcList != null)
+			{
+				toListFromCommands = toListFromCommands.Where(m => !parsedCcList.Any(cc => cc.Address == m.Address && cc.DisplayName == m.DisplayName)).ToList();
+			}
+
+			var summary = toListFromCommands.Concat(parsedToList);
 			var resultList = summary.Where(a => summary.Count(x => x.Address == a.Address) == 1 || !string.IsNullOrEmpty(a.DisplayName)).ToList();
 
 			return resultList;
 		}
 
-		private MailAddress GetMailAddressByAddress(MailAddress address, IList<MailAddress> listOfMails)
+		private MailAddress GetMailAddressesByAddress(MailAddress address, IList<MailAddress> listOfMails)
 		{
 			if (address == null || listOfMails == null)
 			{
@@ -229,6 +247,11 @@ namespace SmtpServerStub.SmtpApplication
 
 			var foundMail = listOfMails.FirstOrDefault(m => m.Address == address.Address && !string.IsNullOrEmpty(m.DisplayName));
 			return foundMail ?? address;
+		}
+
+		private bool ClientHasEndedSendingMail(string dataSection)
+		{
+			return dataSection.EndsWith("\r\n.\r\nQUIT\r\n", true, CultureInfo.InvariantCulture);
 		}
 	}
 }

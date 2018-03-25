@@ -23,10 +23,5 @@ namespace SmtpServerStub.Dtos
 		/// Usually created from *.pfx file. Should be added to allowed certificates on your machine.
 		/// </summary>
 		X509Certificate2 Certificate { get; set; }
-
-	    /// <summary>
-	    /// Useful for debugging tests, but requires logger passed as argument to server constructor.
-	    /// </summary>
-	    bool EnableLogging { get; set; }
     }
 }

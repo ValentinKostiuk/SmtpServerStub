@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Mail;
-using System.Text;
 using System.Text.RegularExpressions;
 using SmtpServerStub.Utilities.Interfaces;
 
@@ -19,16 +18,18 @@ namespace SmtpServerStub.Utilities
 			new Regex(@"<(?<address>[^<>]+?)>",
 				RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-		private static readonly Regex CharsetRegex =
-			new Regex("charset=(?<charset>.+)",
-				RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
 		private static readonly Regex BodyStringPlainMessageRegex = new Regex("(?s)\\\r\\\n\\\r\\\n(?<body>.*)\\\r\\\n\\.\\\r\\\n",
 			RegexOptions.Multiline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
 		private static readonly Regex HeadersParsingRegex = new Regex("(?s)(?<name>[A-Za-z -]+?):\\s*(?<value>.+?)(?=(?:\\\r\\\n[A-Za-z -]+?:)|(?:$))",
 			RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+		public IMailContentDecoder ContentDecoder { get; set; }
+
+		public EmailParser()
+		{
+			ContentDecoder = new MailContentDecoder();
+		}
 		public virtual MailAddress ParseEmailFromString(string commandStr)
 		{
 			var match = MailAddressRegex.Match(commandStr);
@@ -46,6 +47,11 @@ namespace SmtpServerStub.Utilities
 
 		public virtual List<MailAddress> ParseEmailsFromString(string commandStr)
 		{
+			if (commandStr == null)
+			{
+				return new List<MailAddress>();
+			}
+
 			var formattedString = commandStr.Trim().Replace("\n", string.Empty).Replace("\r", string.Empty);
 			var splittedMailPairs = formattedString.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
 			return splittedMailPairs.Select(ParseEmailFromEmailString).Distinct().ToList();
@@ -83,6 +89,16 @@ namespace SmtpServerStub.Utilities
 			return headers.Get("Subject");
 		}
 
+		public virtual bool GetIsMailBodyHtml(NameValueCollection headers)
+		{
+			var contentType = headers.Get("Content-Type");
+			if (contentType == null)
+			{
+				return false;
+			}
+			return contentType.ToLowerInvariant().Contains("text/html");
+		}
+
 		public NameValueCollection ParseHeadersFromDataSection(string dataSection)
 		{
 			var result = new NameValueCollection();
@@ -109,9 +125,8 @@ namespace SmtpServerStub.Utilities
 			var body = match.Groups["body"].Value?.Trim();
 
 			var contentType = headers["Content-Type"];
-			var charsetMatch = CharsetRegex.Match(contentType);
-			var charset = charsetMatch.Groups["charset"].Value;
-			var decodedBody = DecodeQuotedBody(body, charset);
+			var contentTransferEncoding = headers["Content-Transfer-Encoding"];
+			var decodedBody = ContentDecoder.DecodeContent(contentType, contentTransferEncoding, body);
 			return decodedBody;
 		}
 
@@ -124,44 +139,6 @@ namespace SmtpServerStub.Utilities
 		{
 			return dataSection.Contains("boundary=");
 		}
-
-		private static string DecodeQuotedBody(string bodyContent, string bodycharset)
-		{
-			var i = 0;
-			var output = new List<byte>();
-			while (i < bodyContent.Length)
-			{
-				if (bodyContent[i] == '=' && bodyContent[i + 1] == '\r' && bodyContent[i + 2] == '\n')
-				{
-					//Skip
-					i += 3;
-				}
-				else if (bodyContent[i] == '=')
-				{
-					var sHex = bodyContent;
-					sHex = sHex.Substring(i + 1, 2);
-					var hex = Convert.ToInt32(sHex, 16);
-					var b = Convert.ToByte(hex);
-					output.Add(b);
-					i += 3;
-				}
-				else
-				{
-					output.Add((byte) bodyContent[i]);
-					i++;
-				}
-			}
-
-
-			if (string.IsNullOrEmpty(bodycharset))
-			{
-				return Encoding.UTF8.GetString(output.ToArray());
-			}
-			if (String.Compare(bodycharset, "ISO-2022-JP", StringComparison.OrdinalIgnoreCase) == 0)
-			{
-				return Encoding.GetEncoding("Shift_JIS").GetString(output.ToArray());
-			}
-			return Encoding.GetEncoding(bodycharset).GetString(output.ToArray());
-		}
+		
 	}
 }

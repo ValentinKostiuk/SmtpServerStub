@@ -2,12 +2,18 @@
 
 namespace SmtpServerStub.SmtpApplication
 {
-    internal class NoopLogger: ILogger
+	/// <summary>
+	/// Empty implementation of ILogger. Used as null object in case logger was not passed.
+	/// </summary>
+	internal class NoopLogger: ILogger
     {
-        public void LogInfo(string message){}
+	    /// <inheritdoc />
+		public void LogInfo(string message){}
 
-        public void LogError(string message){}
+	    /// <inheritdoc />
+		public void LogError(string message){}
 
-        public void LogWarning(string message){}
+	    /// <inheritdoc />
+		public void LogWarning(string message){}
     }
 }

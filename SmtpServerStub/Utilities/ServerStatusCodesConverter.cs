@@ -14,7 +14,7 @@ namespace SmtpServerStub.Utilities
 			{ResponseCodes.SrvReady, "220 {0} service ready"},
 			{ResponseCodes.SrvClosingChannel, "221 {0} service closing transmission channel"},
 			{ResponseCodes.SrvHello, "250-{0}Requested mail action okay, completed\r\n250 STARTTLS"},
-			{ResponseCodes.SrvHelloNoTls, "250-{0}Requested mail action okay, completed"},
+			{ResponseCodes.SrvHelloNoTls, "250 Requested mail action okay, completed"},
 			{ResponseCodes.RqstActOkCompleted, "250 Requested mail action okay, completed"},
 			{ResponseCodes.UsrWillForward, "251 User not local; will forward to {0}"},
 			{ResponseCodes.CantVrfyUserAttemptDelivery, "252 Cannot VRFY user, but will accept message and attempt delivery"},
