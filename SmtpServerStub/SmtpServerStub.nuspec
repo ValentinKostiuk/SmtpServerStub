@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>ValentinKostyuk.SmtpServerStub</id>
+    <id>SmtpServerStub</id>
     <version>$version$</version>
     <title>$title$</title>
     <authors>valentin.kostiuk@gmail.com</authors>
@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Allows to run simple SMTP server stub on selected port</description>
     <releaseNotes>Testing nuget package build</releaseNotes>
-    <copyright>Copyright 2017</copyright>
-    <tags>SMTP Stub Testing</tags>
+    <copyright>Copyright 2018</copyright>
+    <tags>SMTP Stub Component Testing</tags>
   </metadata>
 </package>
