@@ -32,6 +32,7 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 			Server.GetReceivedMails().Count.Should().Be(7);
 		}
 
+		[Test]
 		public void ContainsCorrectEmailBodyNonAscii()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
@@ -50,6 +51,7 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 			receivedMail.Body.Should().Be(message.Body);
 		}
 
+		[Test]
 		public void ContainsCorrectEmailBodyWithNewLines()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
@@ -68,6 +70,7 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 			receivedMail.Body.Should().Be(message.Body);
 		}
 
+		[Test]
 		public void ContainsCorrectEmailFrom()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
@@ -87,6 +90,7 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 			receivedMail.From.DisplayName.Should().Be(_fromAddress.DisplayName);
 		}
 
+		[Test]
 		public void ContainsCorrectEmailSubject()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
@@ -105,6 +109,7 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 			receivedMail.Subject.Should().Be(message.Subject);
 		}
 
+		[Test]
 		public void ContainsCorrectEmailСс()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
@@ -128,6 +133,7 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 			receivedMail.CC[1].DisplayName.Should().Be(_toAddress.DisplayName);
 		}
 
+		[Test]
 		public void ContainsCorrectEmailTo()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
@@ -145,6 +151,7 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
 		}
 
+		[Test]
 		public void ContainsCorrectEmailToAndCcAreExcludedFromToList()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
@@ -164,6 +171,7 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
 		}
 
+		[Test]
 		public void ContainsCorrectEmailToList()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
@@ -184,6 +192,7 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
 		}
 
+		[Test]
 		public void SetsIsBodyHtml()
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
