@@ -61,7 +61,7 @@ GetReceivedMails() method will wait till all started mail receives are finished 
 Server stub should be initialized with instance of SmtpServerStub.Dtos.SmtpServerSettings class or instance of class which implements ISmtpServerSettings interface. It contains following parameters:
 * IpAddress is instance of [IPAddress](https://msdn.microsoft.com/en-us/library/system.net.ipaddress(v=vs.110).aspx) and serves to specifies IpAddress to which SMTP server should bind.
 * Port is usual integer number and specifies port which stub should listen for incoming e-mails.
-* Certificate is instance of [X509Certificate2](https://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2(v=vs.110).aspx) and should be specified if you have enabled SSL in your e-mail sending functions. This certificate should be valid on you test machine. As SMTP server stub will use it to authenticate as server when it will be requested by client.
+* Certificate is instance of [X509Certificate2](https://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2(v=vs.110).aspx) and should be specified if you have enabled SSL in your e-mail sending functions. This certificate should be valid on you test machine. As SMTP server stub will use it to authenticate as server when it will be requested by client.  
 As second parameter SmtpServer constructor may also receive implementation of SmtpServerStub.Dtos.ILogger which can be usefull while debuging of your tests and seeing why stub has faild message reception.
 Overall initialization can look in following way:
 ```csharp
