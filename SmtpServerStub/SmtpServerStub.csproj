@@ -14,6 +14,9 @@ Component tests added as example.</PackageReleaseNotes>
     <Version>1.1.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
+    <PackageProjectUrl>https://github.com/ValentinKostiuk/SmtpServerStub</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/ValentinKostiuk/SmtpServerStub/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/ValentinKostiuk/SmtpServerStub.git</RepositoryUrl>
 </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

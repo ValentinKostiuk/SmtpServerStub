@@ -8,10 +8,9 @@
     <owners>valentin.kostiuk@gmail.com</owners>
     <licenseUrl>https://github.com/ValentinKostiuk/SmtpServerStub/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/ValentinKostiuk/SmtpServerStub</projectUrl>
-    <!--iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Allows to run simple SMTP server stub on selected port</description>
-    <releaseNotes>Testing nuget package build</releaseNotes>
+    <releaseNotes>Updating documentation</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags>SMTP Stub Component Testing</tags>
   </metadata>
