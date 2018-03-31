@@ -9,9 +9,13 @@ Just install Nuget package using Package Manager Console in VS
 ```
 Install-Package SmtpServerStub -Version 1.1.0
 ```
-Or using NuGet Package Manager.
+Or using NuGet Package Manager search for SmtpServerStub package.
 
 ## Running the tests
+[Synchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Sync)
+[Asynchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Async)
+[Symplified tests without required SSL encryption](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/NoSsl)
+
 
 ### Break down into end to end tests
 
