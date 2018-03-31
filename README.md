@@ -7,7 +7,7 @@ Just add nugget package to your project.
 
 Just install Nuget package using Package Manager Console in VS
 ```
-Install-Package SmtpServerStub -Version 1.0.0
+Install-Package SmtpServerStub -Version 1.1.0
 ```
 Or using NuGet Package Manager.
 
