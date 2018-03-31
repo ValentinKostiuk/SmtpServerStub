@@ -35,8 +35,35 @@ public void RunBeforeAnyTest()
     Console.WriteLine("Server has been reset");
 }
 ```
+Aftet tests have finished running you may need to gracefully stop SMTP server stub.
+```csharp
+[OneTimeTearDown]
+public void RunAfterAllTestsFinished()
+{
+    Server.Stop();
+    Console.WriteLine("Server Stopped");
+}
+```
+In your inherited from base tests you will be able to perform following checks:
+```csharp
+[Test]
+public void ContainsCorrectEmailSubject()
+{
+    CallYourServiceToSendMail();
 
-## Running the tests
+    var receivedMail = Server.GetReceivedMails()[0];
+    receivedMail.Subject.Should().Be("Subject of email");
+}
+```
+GetReceivedMails() method will wait till all started mail receives are finished and will return List of mail objects. Which contain main data you wish to check.
+
+### Changing server default settings
+Server stub should be initialized with instance of SmtpServerStub.Dtos.SmtpServerSettings class or instance of class which implements ISmtpServerSettings interface. It contains following parameters:
+* IpAddress is instance of [IPAddress](https://msdn.microsoft.com/en-us/library/system.net.ipaddress(v=vs.110).aspx) and serves to specifies IpAddress to which SMTP server should bind.
+* Port is usual integer number and specifies port which stub should listen for incoming e-mails.
+* Certificate is instance of [X509Certificate2](https://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2(v=vs.110).aspx) and should be specified if you have enabled SSL in your e-mail sending functions. This certificate should be valid on you test machine. As SMTP server stub will use it to authenticate as server when it will be requested by client.
+
+## Examples in code
 [Synchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Sync)  
 [Asynchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Async)  
 [Simplified tests without required SSL encryption](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/NoSsl)  
