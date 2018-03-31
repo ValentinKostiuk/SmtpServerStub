@@ -62,16 +62,46 @@ Server stub should be initialized with instance of SmtpServerStub.Dtos.SmtpServe
 * IpAddress is instance of [IPAddress](https://msdn.microsoft.com/en-us/library/system.net.ipaddress(v=vs.110).aspx) and serves to specifies IpAddress to which SMTP server should bind.
 * Port is usual integer number and specifies port which stub should listen for incoming e-mails.
 * Certificate is instance of [X509Certificate2](https://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2(v=vs.110).aspx) and should be specified if you have enabled SSL in your e-mail sending functions. This certificate should be valid on you test machine. As SMTP server stub will use it to authenticate as server when it will be requested by client.
+As second parameter SmtpServer constructor may also receive implementation of SmtpServerStub.Dtos.ILogger which can be usefull while debuging of your tests and seeing why stub has faild message reception.
+Overall initialization can look in following way:
+```csharp
+class SomeLogger : ILogger
+{
+    public void LogInfo(string message)
+    {
+        Console.WriteLine(message);
+    }
+
+    public void LogError(string message)
+    {
+        Console.WriteLine(message);
+    }
+
+    public void LogWarning(string message)
+    {
+        Console.WriteLine(message);
+    }
+}
+```
+And in base test one time setup:
+```csharp
+
+var logger = new SomeLogger();
+var settings = new SmtpServerSettings
+    {
+        IpAddress = IPAddress.Any,
+        Port = 4637,
+        Certificate = new X509Certificate2("certificate/file/path", "certificate*passrord", X509KeyStorageFlags.MachineKeySet)
+    };
+Server = new SmtpServer(settings, logger);
+Server.Start();
+Console.WriteLine("Server Started");
+```
 
 ## Examples in code
 [Synchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Sync)  
 [Asynchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Async)  
 [Simplified tests without required SSL encryption](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/NoSsl)  
-
-
-### Break down into end to end tests
-
-### And coding style tests
 
 ## Built With
 
