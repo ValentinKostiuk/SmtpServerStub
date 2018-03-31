@@ -13,17 +13,27 @@ Or using NuGet Package Manager search for SmtpServerStub package.
 
 ## Writing Tests with SmtpServerStub package
 
-Firs of all you will need to initialize and start SmtpServerStub server. The simplest way to do this is to write following code in one time setup. Which will run once in the begining of your test run.
-By default it will start on 25 port of localhost.
+Firs of all you will need to initialize and start SmtpServerStub server. The simplest way to do this is to write following code in one time setup in a base test. Which will run once in the begining of your test run.
+By default stub will start on 25 port of localhost.
 ```csharp
-	[OneTimeSetUp]
-	public void RunBeforeAllTest()
-	{
-		var settings = new SmtpServerSettings();
-		Server = new SmtpServer(settings);
-		Server.Start();
-		Console.WriteLine("Server Started");
-	}
+[OneTimeSetUp]
+public void RunBeforeAllTest()
+{
+    var settings = new SmtpServerSettings();
+    Server = new SmtpServer(settings);
+    Server.Start();
+    Console.WriteLine("Server Started");
+}
+```
+To make your tests more independent you may need to reset server stub state before each test. Do this by adding "before each" method to base test.
+Reseting server state is required to cleare list of already received E-mails and finish all asynchronous tasks, which can be created for receiving other messages.
+```csharp
+[SetUp]
+public void RunBeforeAnyTest()
+{
+    Server.ResetState();
+    Console.WriteLine("Server has been reset");
+}
 ```
 
 ## Running the tests
