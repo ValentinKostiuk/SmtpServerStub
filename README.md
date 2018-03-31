@@ -1,7 +1,7 @@
 # SmtpServerStub
 
 Allows you to check sent E-mails in your .NET project component tests without installing SMTP on your test machine.
-Just add nugget package to your project.
+Server stub is .NET Standard 2.0 library.
 
 ## Getting Started
 
@@ -9,7 +9,7 @@ Just install Nuget package using Package Manager Console in VS
 ```
 Install-Package SmtpServerStub -Version 1.1.0
 ```
-Or using NuGet Package Manager search for SmtpServerStub package.
+Or using NuGet Package Manager, search for SmtpServerStub package.
 
 ## Writing Tests with SmtpServerStub package
 
@@ -26,7 +26,7 @@ public void RunBeforeAllTest()
 }
 ```
 To make your tests more independent you may need to reset server stub state before each test. Do this by adding "before each" method to base test.
-Reseting server state is required to cleare list of already received E-mails and finish all asynchronous tasks, which can be created for receiving other messages.
+Reseting server state is required to cleare list of already received E-mails, drop all assigned to server instance event listeners and finish all asynchronous tasks, which can be created for receiving other messages.
 ```csharp
 [SetUp]
 public void RunBeforeAnyTest()
@@ -97,8 +97,20 @@ Server = new SmtpServer(settings, logger);
 Server.Start();
 Console.WriteLine("Server Started");
 ```
+### Asynchronous mail sending testing
+When call of your component method just starts send mail procedure but there is no guaranty that by the time method returned control to test thread sending has finished you may need to have possibility to know when message has fully received by SMTP server stub. For this case server implements event OnEmailReceived.
+As firs argument of this event listener instance of received server will be passed as second argument instance of SmtpServerStub.Dtos.EmailReceivedEventArgs class will appear. This object will contain received e-mail.
 
-## Examples in code
+```csharp
+Server.OnEmailReceived += (sender, args) =>
+{
+    receivedMessages.Add(args.MailMessage);
+};
+```
+Definitely this approach of testing may require much more magic with [ManualResetEvent-s](https://msdn.microsoft.com/en-us/library/system.threading.manualresetevent(v=vs.110).aspx) wait-ers and timeouts to stabilize your tests. Also such tests may run longer than synchronous tests, depending on how your application manages asynchronous operartions and priorities mail sending tasks.
+Some examples as variant how it can be done you can see in [asyncronous integration tests of this project](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Async)
+
+### Examples in code
 [Synchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Sync)  
 [Asynchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Async)  
 [Simplified tests without required SSL encryption](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/NoSsl)  
