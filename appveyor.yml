@@ -19,13 +19,14 @@
   build_script:
    - msbuild SmtpServerStub\SmtpServerStub.csproj /v:q /p:Configuration=Release
    - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q /p:Configuration=Release
-  test_script:
-   - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe" -targetargs:"SmtpServerStubUnitTests\bin\Release\SmtpServerStubUnitTests.dll" -filter:"+[SmtpServerStub*]* -[SmtpServerStubUnitTests*]*"
+  test:
+   assemblies:
+    - '**\SmtpServerStubUnitTests.dll'
   after_test:
    - ps: |
        $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
        Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-       bash codecov.sh -f "results.xml" -t 675a48a6-4a27-44a5-b311-8b1ef26fd4b7
+       bash codecov.sh -f "TestResult.xml" -t 675a48a6-4a27-44a5-b311-8b1ef26fd4b7
   artifacts:
    - path: '**\SmtpServerStub.*.nupkg'
   deploy:
@@ -44,7 +45,7 @@
   image:
    - Visual Studio 2017
   before_build:
-   - nuget restore
+   - nuget restore -Verbosity quiet
   dotnet_csproj:
    patch: true
    file: '**\SmtpServerStub.csproj'
