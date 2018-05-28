@@ -7,7 +7,7 @@
   image:
    - Visual Studio 2017
   before_build:
-   - nuget restore
+   - nuget restore -Verbosity quiet
   dotnet_csproj:
    patch: true
    file: '**\SmtpServerStub.csproj'
@@ -64,7 +64,7 @@
    - ps: |
        $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
        Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-       bash codecov.sh -f "TestResult.xml" -t 675a48a6-4a27-44a5-b311-8b1ef26fd4b7
+       bash codecov.sh -f "ohoho.xml" -t 675a48a6-4a27-44a5-b311-8b1ef26fd4b7
   artifacts:
    - path: '**\SmtpServerStub.*.nupkg'
   deploy:
