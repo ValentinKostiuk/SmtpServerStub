@@ -17,8 +17,8 @@
    file_version: '{version}'
    informational_version: '{version}'
   build_script:
-   - msbuild SmtpServerStub\SmtpServerStub.csproj /v:q
-   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q
+   - msbuild SmtpServerStub\SmtpServerStub.csproj /v:q /p:Configuration=Release
+   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q /p:Configuration=Release
   test_script:
    - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe" -targetargs:"SmtpServerStubUnitTests\bin\Debug\SmtpServerStubUnitTests.dll" -filter:"+[SmtpServerStub*]* -[SmtpServerStubUnitTests*]*"
   after_test:
@@ -54,8 +54,8 @@
    file_version: '{version}'
    informational_version: '{version}'
   build_script:
-   - msbuild SmtpServerStub\SmtpServerStub.csproj /v:q
-   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q
+   - msbuild SmtpServerStub\SmtpServerStub.csproj /v:q /p:Configuration=Release
+   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q /p:Configuration=Release
   test_script:
    - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe" -targetargs:"SmtpServerStubUnitTests\bin\Debug\SmtpServerStubUnitTests.dll" -filter:"+[SmtpServerStub*]* -[SmtpServerStubUnitTests*]*"
   after_test:
