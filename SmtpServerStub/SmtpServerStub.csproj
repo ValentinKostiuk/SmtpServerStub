@@ -6,9 +6,8 @@
     <PackageVersion>1.0.0</PackageVersion>
     <Authors>valentin.kostiuk@gmail.com</Authors>
     <Description>Allows to run simple SMTP server stub on selected port</Description>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>Updated simpilified interface.
-Component tests added as example.</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Updated simpilified interface</PackageReleaseNotes>
     <Copyright>Copyright 2018</Copyright>
     <PackageTags>SMTP Stub Component Testing</PackageTags>
     <Version>1.1.0</Version>
@@ -17,10 +16,10 @@ Component tests added as example.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/ValentinKostiuk/SmtpServerStub</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/ValentinKostiuk/SmtpServerStub/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/ValentinKostiuk/SmtpServerStub.git</RepositoryUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <IncludeSource>True</IncludeSource>
+    <IncludeSymbols>True</IncludeSymbols>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
 </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard2.0\SmtpServerStub.xml</DocumentationFile>
-  </PropertyGroup>
 
 </Project>
