@@ -56,8 +56,9 @@
   build_script:
    - msbuild SmtpServerStub\SmtpServerStub.csproj /v:q
    - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q
-  test_script:
-   - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe" -targetargs:"SmtpServerStubUnitTests\bin\Debug\SmtpServerStubUnitTests.dll" -filter:"+[SmtpServerStub*]* -[SmtpServerStubUnitTests*]*"
+  test:
+   assemblies:
+    - '**\SmtpServerStubUnitTests.dll'
   after_test:
    - ps: |
        $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
