@@ -63,11 +63,10 @@
 #       Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
 #       bash codecov.sh -f "coverage.xml" -t 675a48a6-4a27-44a5-b311-8b1ef26fd4b7
   artifacts:
-   - path: '**\SmtpServerStub.*.nupkg'
-   - path: '**\SmtpServerStub.*.snupkg'
+   - path: '**\SmtpServerStub.*(\.|\.s)nupkg'
   deploy:
    provider: NuGet
    api_key:
     secure: xIwIVBvFAcgy3tkdaepNHFova+zpQEPPfJEnAgWJXcoGTxudFei6Ao+SjEF/v45/
-   skip_symbols: false
-   artifact: /.*nupkg/
+   skip_symbols: true
+   artifact: /.*(\.|\.s)nupkg/
