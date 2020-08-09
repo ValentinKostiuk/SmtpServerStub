@@ -70,4 +70,4 @@
    api_key:
     secure: xIwIVBvFAcgy3tkdaepNHFova+zpQEPPfJEnAgWJXcoGTxudFei6Ao+SjEF/v45/
    skip_symbols: false
-   artifact: /.*\.nupkg/
+   artifact: /.*nupkg/
