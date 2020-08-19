@@ -8,6 +8,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmtpServerStubUnitTests", "SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj", "{F9FE97FA-7E48-4D6C-82CD-BF4C21053D5E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmtpServerStubIntegrationTests", "SmtpServerStubIntegrationTests\SmtpServerStubIntegrationTests.csproj", "{50DECC74-0A01-4673-AC38-60BB335A5FD1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{08643C72-D3FD-4F71-9A26-2642F5D9D83B} = {08643C72-D3FD-4F71-9A26-2642F5D9D83B}
+		{F9FE97FA-7E48-4D6C-82CD-BF4C21053D5E} = {F9FE97FA-7E48-4D6C-82CD-BF4C21053D5E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

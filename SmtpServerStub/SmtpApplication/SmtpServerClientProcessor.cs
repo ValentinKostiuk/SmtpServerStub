@@ -93,8 +93,6 @@ namespace SmtpServerStub.SmtpApplication
 						case RequestCommands.ParseError:
 							processingFinished = true;
 							break;
-						default:
-							break;
 					}
 				}
 			}
@@ -123,9 +121,11 @@ namespace SmtpServerStub.SmtpApplication
 				{
 					Logger.LogError(string.Format("Inner exception: {0}\n", e.InnerException.Message));
 				}
+
 				_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.AccessDenied));
 				return true;
 			}
+
 			return false;
 		}
 
@@ -160,6 +160,7 @@ namespace SmtpServerStub.SmtpApplication
 			{
 				message.To.Add(recipient);
 			}
+
 			_clientController.Write(ServerStatusCodesConverter.GetTextResponseForStatus(ResponseCodes.RqstActOkCompleted));
 			return false;
 		}
@@ -195,6 +196,7 @@ namespace SmtpServerStub.SmtpApplication
 				messageData.Append(strMessage);
 				strMessage = _clientController.Read();
 			}
+
 			messageData.Append(strMessage);
 
 			var msgDataStr = messageData.ToString();
@@ -229,11 +231,14 @@ namespace SmtpServerStub.SmtpApplication
 
 			if (parsedCcList != null)
 			{
-				toListFromCommands = toListFromCommands.Where(m => !parsedCcList.Any(cc => cc.Address == m.Address && cc.DisplayName == m.DisplayName)).ToList();
+				toListFromCommands = toListFromCommands.Where(m => !parsedCcList.Any(cc => cc.Address == m.Address && cc.DisplayName == m.DisplayName))
+					.ToList();
 			}
 
 			var summary = toListFromCommands.Concat(parsedToList);
-			var resultList = summary.Where(a => summary.Count(x => x.Address == a.Address) == 1 || !string.IsNullOrEmpty(a.DisplayName)).ToList();
+			var resultList = summary
+				.GroupBy(x => x.Address)
+				.Select(g => g.OrderByDescending(m => m.DisplayName).First()).ToList();
 
 			return resultList;
 		}

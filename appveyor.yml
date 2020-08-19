@@ -7,7 +7,7 @@
   image:
    - Visual Studio 2017
   before_build:
-   - nuget restore
+   - nuget restore -Verbosity quiet
   dotnet_csproj:
    patch: true
    file: '**\SmtpServerStub.csproj'
@@ -17,23 +17,19 @@
    file_version: '{version}'
    informational_version: '{version}'
   build_script:
-   - msbuild SmtpServerStub\SmtpServerStub.csproj /t:pack /v:q
-   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q
-  test_script:
-   - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe" -targetargs:"SmtpServerStubUnitTests\bin\Debug\SmtpServerStubUnitTests.dll" -filter:"+[SmtpServerStub*]* -[SmtpServerStubUnitTests*]*"
-  after_test:
-   - ps: |
-       $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-       Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-       bash codecov.sh -f "results.xml" -t 675a48a6-4a27-44a5-b311-8b1ef26fd4b7
+   - msbuild SmtpServerStub\SmtpServerStub.csproj /v:q /p:Configuration=Release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg
+   - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q /p:Configuration=Release
+  test:
+   assemblies:
+    - '**\SmtpServerStubUnitTests.dll'
   artifacts:
-   - path: '**\SmtpServerStub.*.nupkg'
+  - path: '**\SmtpServerStub.*nupkg'
+    type: NuGetPackage
   deploy:
    provider: NuGet
    api_key:
-    secure: QCRp8iRF7MVtmNv8X30viZhWIKNWsKfcLEczXKONoDthMbAs0rZK7CiMhCQSa5P/
-   skip_symbols: true
-   artifact: /.*\.nupkg/
+    secure: xIwIVBvFAcgy3tkdaepNHFova+zpQEPPfJEnAgWJXcoGTxudFei6Ao+SjEF/v45/
+   artifact: /.*(?<!symbols)(\.|\.s)nupkg/
 
 # configuration for development branches
 -
@@ -44,7 +40,7 @@
   image:
    - Visual Studio 2017
   before_build:
-   - nuget restore
+   - nuget restore -Verbosity quiet
   dotnet_csproj:
    patch: true
    file: '**\SmtpServerStub.csproj'
@@ -54,22 +50,17 @@
    file_version: '{version}'
    informational_version: '{version}'
   build_script:
-   - msbuild SmtpServerStub\SmtpServerStub.csproj /t:pack /v:q
+   - msbuild SmtpServerStub\SmtpServerStub.csproj /v:q /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg
    - msbuild SmtpServerStubUnitTests\SmtpServerStubUnitTests.csproj /v:q
-  test_script:
-   - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe" -targetargs:"SmtpServerStubUnitTests\bin\Debug\SmtpServerStubUnitTests.dll" -filter:"+[SmtpServerStub*]* -[SmtpServerStubUnitTests*]*"
-  after_test:
-   - ps: |
-       $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-       Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-       bash codecov.sh -f "results.xml" -t 675a48a6-4a27-44a5-b311-8b1ef26fd4b7
-  artifacts:
-   - path: '**\SmtpServerStub.*.nupkg'
+  test:
+   assemblies:
+    - '**\SmtpServerStubUnitTests.dll'
+  artifacts: 
+  - path: '**\SmtpServerStub.*nupkg'
+    type: NuGetPackage
   deploy:
    provider: NuGet
-   on:
-    branch: development
    api_key:
-    secure: QCRp8iRF7MVtmNv8X30viZhWIKNWsKfcLEczXKONoDthMbAs0rZK7CiMhCQSa5P/
-   skip_symbols: true
-   artifact: /.*\.nupkg/
+    secure: xIwIVBvFAcgy3tkdaepNHFova+zpQEPPfJEnAgWJXcoGTxudFei6Ao+SjEF/v45/
+   artifact: /.*(?<!symbols)(\.|\.s)nupkg/
+   
