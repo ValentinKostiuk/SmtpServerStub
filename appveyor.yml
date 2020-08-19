@@ -55,7 +55,7 @@
   test:
    assemblies:
     - '**\SmtpServerStubUnitTests.dll'
-  rtifacts: 
+  artifacts: 
 - path: '**\SmtpServerStub.*nupkg'
   type: NuGetPackage
   deploy:
