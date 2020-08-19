@@ -111,9 +111,9 @@ Definitely this approach of testing may require much more magic with [ManualRese
 Some examples as variant how it can be done you can see in [asyncronous integration tests of this project](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Async)
 
 ### Examples in code
-[Synchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Sync)  
-[Asynchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/Async)  
-[Simplified tests without required SSL encryption](https://github.com/ValentinKostiuk/SmtpServerStub/tree/DocumentationUpdate/SmtpServerStubIntegrationTests/NoSsl)  
+[Synchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/master/DocumentationUpdate/SmtpServerStubIntegrationTests/Sync)  
+[Asynchronous check exapmples](https://github.com/ValentinKostiuk/SmtpServerStub/tree/master/DocumentationUpdate/SmtpServerStubIntegrationTests/Async)  
+[Simplified tests without required SSL encryption](https://github.com/ValentinKostiuk/SmtpServerStub/tree/master/DocumentationUpdate/SmtpServerStubIntegrationTests/NoSsl)  
 
 ## Built With
 
