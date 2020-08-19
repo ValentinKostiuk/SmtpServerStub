@@ -63,3 +63,4 @@
    api_key:
     secure: xIwIVBvFAcgy3tkdaepNHFova+zpQEPPfJEnAgWJXcoGTxudFei6Ao+SjEF/v45/
    artifact: /.*(?<!symbols)(\.|\.s)nupkg/
+   
