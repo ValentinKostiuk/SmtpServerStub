@@ -187,9 +187,11 @@ namespace SmtpServerStubIntegrationTests.NoSsl
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
-			receivedMail.To.Count.Should().Be(1);
+			receivedMail.To.Count.Should().Be(2);
 			receivedMail.To[0].Address.Should().Be(_toAddress.Address);
 			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
+			receivedMail.To[1].Address.Should().Be(_toAddress2.Address);
+			receivedMail.To[1].DisplayName.Should().Be(_toAddress2.DisplayName);
 		}
 
 		[Test]

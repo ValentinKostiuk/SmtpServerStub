@@ -10,6 +10,7 @@ namespace SmtpServerStubIntegrationTests.Sync
 		private readonly MailAddress _fromAddress = new MailAddress("valentin.kostiukFrom@gmail.com", "From Name");
 		private readonly MailAddress _toAddress = new MailAddress("valentin.kostiuk@gmail.com", "To Name");
 		private readonly MailAddress _toAddress2 = new MailAddress("valentin.kostiuk2@gmail.com");
+		private readonly MailAddress _toAddress3 = new MailAddress("valentin.kostiuk3@gmail.com", "To Name3");
 
 		[TestCase(true)]
 		[TestCase(false)]
@@ -95,6 +96,26 @@ namespace SmtpServerStubIntegrationTests.Sync
 
 		[TestCase(true)]
 		[TestCase(false)]
+		public void ContainsCorrectEmailFromWithEmptyDisplayName(bool enableSsl)
+		{
+			var message = new MailMessage
+			{
+				Subject = "Subject of email",
+				Body = "Body of the best email ever.",
+				To = { _toAddress },
+				From = new MailAddress(_fromAddress.Address)
+			};
+
+			SendMessage(message, enableSsl);
+
+			var receivedMail = Server.GetReceivedMails()[0];
+
+			receivedMail.From.Address.Should().Be(_fromAddress.Address);
+			receivedMail.From.DisplayName.Should().Be("");
+		}
+
+		[TestCase(true)]
+		[TestCase(false)]
 		public void ContainsCorrectEmailSubject(bool enableSsl)
 		{
 			var message = new MailMessage(_fromAddress, _toAddress)
@@ -136,6 +157,99 @@ namespace SmtpServerStubIntegrationTests.Sync
 			receivedMail.CC[0].DisplayName.Should().Be(_toAddress2.DisplayName);
 			receivedMail.CC[1].Address.Should().Be(_toAddress.Address);
 			receivedMail.CC[1].DisplayName.Should().Be(_toAddress.DisplayName);
+		}
+
+		[TestCase(true)]
+		[TestCase(false)]
+		public void ContainsCorrectEmailToWithNoDisplayName(bool enableSsl)
+		{
+			var message = new MailMessage
+			{
+				Subject = "Subject of email",
+				Body = "Body of the best email ever.",
+				To = { _toAddress.Address },
+				From = new MailAddress(_fromAddress.Address)
+			};
+
+			SendMessage(message, enableSsl);
+
+			var receivedMail = Server.GetReceivedMails()[0];
+
+			receivedMail.To.Count.Should().Be(1);
+			receivedMail.To[0].Address.Should().Be(_toAddress.Address);
+			receivedMail.To[0].DisplayName.Should().Be("");
+		}
+
+		[TestCase(true)]
+		[TestCase(false)]
+		public void ContainsCorrectEmailToWithNoDisplayNameMultiple(bool enableSsl)
+		{
+			var message = new MailMessage
+			{
+				Subject = "Subject of email",
+				Body = "Body of the best email ever.",
+				To = { _toAddress.Address, _toAddress2.Address },
+				From = new MailAddress(_fromAddress.Address)
+			};
+
+			SendMessage(message, enableSsl);
+
+			var receivedMail = Server.GetReceivedMails()[0];
+
+			receivedMail.To.Count.Should().Be(2);
+			receivedMail.To[0].Address.Should().Be(_toAddress.Address);
+			receivedMail.To[0].DisplayName.Should().Be("");
+			receivedMail.To[1].Address.Should().Be(_toAddress2.Address);
+			receivedMail.To[1].DisplayName.Should().Be("");
+		}
+
+		[TestCase(true)]
+		[TestCase(false)]
+		public void ContainsCorrectEmailToSelectWithDisplayName(bool enableSsl)
+		{
+			var message = new MailMessage
+			{
+				Subject = "Subject of email",
+				Body = "Body of the best email ever.",
+				To = { _toAddress.Address},
+				From = new MailAddress(_fromAddress.Address)
+			};
+
+			message.To.Add(_toAddress);
+
+			SendMessage(message, enableSsl);
+
+			var receivedMail = Server.GetReceivedMails()[0];
+
+			receivedMail.To.Count.Should().Be(1);
+			receivedMail.To[0].Address.Should().Be(_toAddress.Address);
+			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
+		}
+
+		[TestCase(true)]
+		[TestCase(false)]
+		public void ContainsCorrectEmailToSelectWithDisplayNameMultiple(bool enableSsl)
+		{
+			var message = new MailMessage
+			{
+				Subject = "Subject of email",
+				Body = "Body of the best email ever.",
+				To = { _toAddress.Address, _toAddress3.Address },
+				From = new MailAddress(_fromAddress.Address)
+			};
+
+			message.To.Add(_toAddress);
+			message.To.Add(_toAddress3);
+
+			SendMessage(message, enableSsl);
+
+			var receivedMail = Server.GetReceivedMails()[0];
+
+			receivedMail.To.Count.Should().Be(2);
+			receivedMail.To[0].Address.Should().Be(_toAddress.Address);
+			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
+			receivedMail.To[1].Address.Should().Be(_toAddress3.Address);
+			receivedMail.To[1].DisplayName.Should().Be(_toAddress3.DisplayName);
 		}
 
 		[TestCase(true)]
@@ -195,9 +309,11 @@ namespace SmtpServerStubIntegrationTests.Sync
 
 			var receivedMail = Server.GetReceivedMails()[0];
 
-			receivedMail.To.Count.Should().Be(1);
+			receivedMail.To.Count.Should().Be(2);
 			receivedMail.To[0].Address.Should().Be(_toAddress.Address);
 			receivedMail.To[0].DisplayName.Should().Be(_toAddress.DisplayName);
+			receivedMail.To[1].Address.Should().Be(_toAddress2.Address);
+			receivedMail.To[1].DisplayName.Should().Be(_toAddress2.DisplayName);
 		}
 
 		[TestCase(true)]
